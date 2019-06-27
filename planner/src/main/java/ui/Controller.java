@@ -1,4 +1,4 @@
-package app.ui;
+package ui;
 
 
 import com.jfoenix.controls.JFXTreeTableColumn;

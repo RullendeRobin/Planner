@@ -1,4 +1,4 @@
-package app.ui;
+package ui;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -10,7 +10,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("resources/test2.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("test2.fxml"));
         primaryStage.setTitle("Planner");
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
@@ -18,6 +18,6 @@ public class Main extends Application {
 
 
     public static void main(String[] args) {
-        launch(args);
+        Application.launch(args);
     }
 }
