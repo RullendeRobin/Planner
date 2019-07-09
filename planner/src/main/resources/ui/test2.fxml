@@ -1,61 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXTabPane?>
+<?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXTreeTableView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 
-<StackPane prefHeight="540.0" prefWidth="1020.0" stylesheets="@theme.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.Controller">
+<StackPane onKeyPressed="#handleOnKeyPressed" prefHeight="540.0" prefWidth="1020.0" stylesheets="@theme.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.Controller">
    <children>
       <BorderPane prefHeight="200.0" prefWidth="200.0">
-         <center>
-            <JFXTabPane side="BOTTOM" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
-               <tabs>
-                  <Tab text="Summary">
-                    <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <JFXTreeTableView fx:id="table" tableMenuButtonVisible="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <columnResizePolicy>
-                                    <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                 </columnResizePolicy>
-                              </JFXTreeTableView>
-                           </children></AnchorPane>
-                    </content>
-                  </Tab>
-                  <Tab text="Finance">
-                    <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                           <children>
-                              <JFXTreeTableView fx:id="table2" prefHeight="487.2" prefWidth="1020.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <columnResizePolicy>
-                                    <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                 </columnResizePolicy>
-                              </JFXTreeTableView>
-                           </children></AnchorPane>
-                    </content>
-                  </Tab>
-                  <Tab text="Accounting">
-                     <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="225.0" prefWidth="132.0">
-                           <children>
-                              <JFXTreeTableView fx:id="table3" prefHeight="487.2" prefWidth="1020.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                 <columnResizePolicy>
-                                    <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                 </columnResizePolicy>
-                              </JFXTreeTableView>
-                           </children></AnchorPane>
-                     </content>
-                  </Tab>
-               </tabs>
-            </JFXTabPane>
-         </center>
          <top>
             <MenuBar BorderPane.alignment="CENTER">
               <menus>
@@ -77,6 +35,34 @@
               </menus>
             </MenuBar>
          </top>
+         <bottom>
+            <HBox maxHeight="30.0" minHeight="30.0" prefHeight="30.0" prefWidth="200.0" style="-fx-background-color: #71b5ff;" BorderPane.alignment="CENTER">
+               <children>
+                  <JFXButton maxHeight="30.0" minHeight="30.0" onAction="#handleSummary" prefHeight="30.0" ripplerFill="WHITE" text="Summary" textAlignment="CENTER" textFill="WHITE" />
+                  <JFXButton onAction="#handleFinance" text="Finance" />
+                  <JFXButton onAction="#handleAssets" text="Assets" />
+                  <JFXButton onAction="#handleHSE" text="HSE" />
+                  <JFXButton onAction="#handleStakeholders" text="Stakeholders" />
+                  <JFXButton layoutX="268.0" layoutY="10.0" onAction="#handleAuthorities" text="Authorities" />
+                  <JFXButton layoutX="372.0" layoutY="10.0" onAction="#handleGrid" text="Grid" />
+                  <JFXButton layoutX="476.0" layoutY="10.0" onAction="#handleCivil" text="Civil" />
+                  <JFXButton layoutX="512.0" layoutY="10.0" onAction="#handleInsurance" text="Insurance" />
+                  <JFXButton layoutX="559.0" layoutY="10.0" onAction="#handleAccounting" text="Accounting" />
+                  <JFXButton layoutX="641.0" layoutY="10.0" onAction="#handleRevision" text="Revision" />
+               </children>
+            </HBox>
+         </bottom>
+         <center>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <JFXTreeTableView fx:id="table" editable="true" onMouseClicked="#showPopup" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <columnResizePolicy>
+                        <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
+                  </JFXTreeTableView>
+               </children>
+            </AnchorPane>
+         </center>
       </BorderPane>
    </children>
 </StackPane>

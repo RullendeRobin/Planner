@@ -22,15 +22,14 @@
 }
 
 .button{
-    -fx-text-fill: -fx-primarytext;
+    -fx-text-fill: white;
     -fx-background-color: -fx-primary;
-    -fx-border-color: -fx-secondary;
-    -fx-border-radius: 20px;
-    -fx-background-radius: 20px;
-    -fx-font-size: 12pt;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+    -fx-font-size: 11pt;
 }
 
-.button:hover, .button:focused{
+.button:hover, .button:focused {
     -fx-border-color: -fx-secondary;
     -fx-background-color: -fx-secondary;
     -fx-text-fill: -fx-primary;
@@ -173,8 +172,7 @@
     -fx-pie-color: derive(-fx-primary, 30%);
     -fx-border-color: derive(-fx-primary, 30%);
 }
-.chart-pie-label
-{
+.chart-pie-label {
     -fx-fill : derive(-fx-secondary, -5%);
 }
 
@@ -338,7 +336,10 @@
 }
 .jfx-tab-pane .tab-selected-line {
     -fx-background-color: transparent;
-
+}
+.jfx-tab-pane {
+    -fx-open-tab-animation: NONE;
+    -fx-close-tab-animation: NONE;
 }
 .jfx-tab-pane .tab:selected {
     -fx-border-width: 0 0 1.5 0;
