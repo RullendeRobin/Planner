@@ -2,16 +2,12 @@ package core;
 
 import com.jfoenix.controls.cells.editors.base.JFXTreeTableCell;
 import javafx.beans.value.ChangeListener;
-import javafx.event.Event;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTablePosition;
 import javafx.scene.input.KeyCode;
 
 public class CustomStringCell extends JFXTreeTableCell<DataEntry, String> {
-    protected TextField textField;
-    protected ChangeListener<? super Boolean> changeListener = (obs, ov, nv) -> {
+    private TextField textField;
+    private ChangeListener<? super Boolean> changeListener = (obs, ov, nv) -> {
         if (!nv) {
             commitEdit(textField.getText());
         }
@@ -40,7 +36,7 @@ public class CustomStringCell extends JFXTreeTableCell<DataEntry, String> {
     @Override
     public void cancelEdit() {
         super.cancelEdit();
-        setText((String) getItem());
+        setText(getItem());
         setGraphic(null);
     }
 
@@ -66,7 +62,7 @@ public class CustomStringCell extends JFXTreeTableCell<DataEntry, String> {
         }
     }
 
-    protected void createTextField() {
+    private void createTextField() {
         textField = new TextField(getString());
         textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
         textField.focusedProperty().addListener(changeListener);
@@ -84,8 +80,8 @@ public class CustomStringCell extends JFXTreeTableCell<DataEntry, String> {
     }
 
 
-    protected String getString() {
-        return getItem() == null ? "" : getItem().toString();
+    private String getString() {
+        return getItem() == null ? "" : getItem();
     }
     /*
     @Override

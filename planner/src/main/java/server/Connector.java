@@ -1,66 +1,188 @@
 package server;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import core.DataEntry;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
-import java.sql.Connection;
-import java.sql.Statement;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.DriverManager;
+import java.sql.*;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Connector {
 
-    public DataEntry getData() {
+    private static final String sqlSelect = "SELECT * FROM Activities";
+    private static final String sqlInsert = "INSERT INTO Activities (GroupName, Activity, Mandatory, PlannedStart, PlannedEnd, Completion, Responsible, CurrStatus) "
+            + "VALUES (?,?,?,?,?,?,?,?)";
+    private static final String sqlDelete = "DELETE FROM Activities WHERE Activity = ? AND PlannedStart = ?";
 
-        // Connect to database
-        String hostName = "plannersqlserver.database.windows.net"; // update me
-        String dbName = "plannerDatabase"; // update me
-        String user = "zephyradmin"; // update me
-        String password = "VelkommenZephyr2019!"; // update me
-        String url = String.format("jdbc:sqlserver://%s:1433;database=%s;user=%s;password=%s;encrypt=true;"
-                + "hostNameInCertificate=*.database.windows.net;loginTimeout=30;", hostName, dbName, user, password);
-        Connection connection = null;
+    private static HikariConfig config = new HikariConfig();
+    private static HikariDataSource ds;
+    private static boolean autoUpdate = false;
+
+    private final String hostName = "plannersqlserver.database.windows.net"; // set server address
+    private final String dbName = "plannerDatabase"; // set database name
+    private final String user = "zephyradmin"; // set database username
+    private final String password = "VelkommenZephyr2019!"; // set database password
+    private final String url = String.format("jdbc:sqlserver://%s:1433;database=%s;user=%s;password=%s;encrypt=true;"
+            + "hostNameInCertificate=*.database.windows.net;loginTimeout=30;", hostName, dbName, user, password);
+
+
+
+
+    public Connector() {
+        ds = getDataSource();
+    }
+
+    private static Connection getConnection() throws SQLException {
+        return ds.getConnection();
+    }
+
+
+    private HikariDataSource getDataSource() {
+        HikariConfig config = new HikariConfig();
+        config.setMaximumPoolSize(10);
+        config.setDataSourceClassName("com.microsoft.sqlserver.jdbc.SQLServerDataSource");
+        config.addDataSourceProperty("serverName", this.hostName);
+        config.addDataSourceProperty("databaseName", this.dbName);
+        config.addDataSourceProperty("user", this.user);
+        config.addDataSourceProperty("password", this.password);
+
+        return new HikariDataSource(config);  //pass in HikariConfig to HikariDataSource
+    }
+
+    public static ObservableList<DataEntry> getData() {
+
+        PreparedStatement statement = null;
         DataEntry entry = null;
+        ObservableList<DataEntry> obsList = FXCollections.observableArrayList();
 
-        try {
-            connection = DriverManager.getConnection(url);
-            String schema = connection.getSchema();
-            System.out.println("Successful connection - Schema: " + schema);
+        try (Connection connection = getConnection()) {
 
-            System.out.println("Query data example:");
-            System.out.println("=========================================");
+            connection.setAutoCommit(false);
+            // Execute a SQL statement.
+            statement = connection.prepareStatement(sqlSelect);
+            ResultSet rs = statement.executeQuery();
+            connection.commit();
 
-            // Create and execute a SELECT SQL statement.
-            String selectSql = "SELECT * FROM Activities";
+                // Save results from select statement
+                while (rs.next()) {
 
-            try (Statement statement = connection.createStatement();
-                 ResultSet rs = statement.executeQuery(selectSql)) {
+                    Date d1 = convertToUtilDate(rs.getDate(5));
+                    Date d2 = convertToUtilDate(rs.getDate(6));
+                    Date d3 = convertToUtilDate(rs.getDate(7));
 
-                // Print results from select statement
-                while (rs.next())
-                {
-                    Date d1 = converter(rs.getDate(4));
-                    Date d2 = converter(rs.getDate(5));
-                    Date d3 = converter(rs.getDate(6));
-
-                    entry = new DataEntry(rs.getString(1), rs.getString(2), rs.getString(3), d1, d2, d3, rs.getString(7), rs.getString(8));
+                    entry = new DataEntry(rs.getString(2), rs.getString(3), rs.getString(4), d1, d2, d3, rs.getString(8), rs.getString(9));
+                    obsList.add(entry);
                 }
-                connection.close();
-            }
-        }
-        catch (Exception e) {
+
+        } catch (SQLException e) {
+            Logger lgr = Logger.getLogger(Connector.class.getName());
+            lgr.log(Level.SEVERE, e.getMessage(), e);
             e.printStackTrace();
         }
-        return entry;
+
+        return obsList;
     }
 
-    private Date converter(java.sql.Date date) {
-        if (date == null) {
-            return null;
-        } else {
-            return new Date(date.getTime());
+    public void insertData(DataEntry entry) {
+
+        PreparedStatement statement = null;
+
+        try (Connection connection = getConnection()){
+
+            connection.setAutoCommit(false);
+            statement = connection.prepareStatement(sqlInsert);
+
+            statement.setString(1, entry.getGroup());
+            statement.setString(2, entry.getActivity());
+            statement.setString(3, entry.getMandatory());
+            statement.setDate(4, convertToSQLDate(entry.getStart()));
+            statement.setDate(5, convertToSQLDate(entry.getPlannedEnd()));
+            statement.setDate(6, convertToSQLDate(entry.getEnd()));
+            statement.setString(7, entry.getResponsible());
+            statement.setString(8, entry.getStatus());
+
+            statement.executeUpdate();
+            connection.commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
+    public void deleteData(DataEntry entry) {
+
+        PreparedStatement statement = null;
+
+        try (Connection connection = getConnection()){
+
+            connection.setAutoCommit(false);
+            statement = connection.prepareStatement(sqlDelete);
+
+            statement.setString(1, entry.getActivity());
+            statement.setDate(2, convertToSQLDate(entry.getStart()));
+
+            statement.executeUpdate();
+            connection.commit();
+            System.out.println("Row deleted");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Return null if the date is null, otherwise return a java.util.Date
+    private static Date convertToUtilDate(java.sql.Date date) {
+        return (date == null) ? null : new Date(date.getTime());
+    }
+
+    // Return null if the date is null, otherwise return a java.sql.Date
+    private static java.sql.Date convertToSQLDate(Date date) {
+        return (date == null) ? null : new java.sql.Date(date.getTime());
+    }
+
+    // Getter and setter for autoUpdate boolean
+    public static boolean getAutoUpdate() {
+        return autoUpdate;
+    }
+
+    public static void setAutoUpdate(boolean autoUpdate) {
+        Connector.autoUpdate = autoUpdate;
+    }
+
+    // Queries the database after each period. If there are changes made to the database, the changes will be reflected in the local data.
+    // autoUpdate boolean must true for loop to run
+    public static void autoUpdate(ObservableList<DataEntry> data) {
+
+        java.util.TimerTask task = new java.util.TimerTask() {
+            @Override
+            public void run() {
+
+                if (getAutoUpdate()) {
+
+                    ObservableList<DataEntry> temp = getData();
+
+                    if (!data.toString().equals(temp.toString())) {
+                        data.clear();
+                        data.addAll(temp);
+                        System.out.println("Data updated.");
+                    }
+                }
+            }
+        };
+        java.util.Timer timer = new java.util.Timer(true);// true to run timer as daemon thread
+        timer.schedule(task, 0, 500);// Run task every 0.5 second
+        /*
+        try {
+            Thread.sleep(60000); // Cancel task after 1 minute.
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        timer.cancel();
+
+         */
+    }
 }

@@ -13,9 +13,9 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
     private StringProperty group;
     private StringProperty activity;
     private StringProperty mandatory;
-    private ObjectProperty start;
-    private ObjectProperty plannedEnd;
-    private ObjectProperty end;
+    private ObjectProperty<Date> start;
+    private ObjectProperty<Date> plannedEnd;
+    private ObjectProperty<Date> end;
     private StringProperty responsible;
     private StringProperty status;
 
@@ -67,7 +67,7 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
         this.mandatory.set(mandatory);
     }
 
-    public Object getStart() {
+    public Date getStart() {
         return start.get();
     }
 
@@ -75,11 +75,11 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
         return start;
     }
 
-    public void setStart(Object start) {
+    public void setStart(Date start) {
         this.start.set(start);
     }
 
-    public Object getPlannedEnd() {
+    public Date getPlannedEnd() {
         return plannedEnd.get();
     }
 
@@ -87,11 +87,11 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
         return plannedEnd;
     }
 
-    public void setPlannedEnd(Object plannedEnd) {
+    public void setPlannedEnd(Date plannedEnd) {
         this.plannedEnd.set(plannedEnd);
     }
 
-    public Object getEnd() {
+    public Date getEnd() {
         return end.get();
     }
 
@@ -99,7 +99,7 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
         return end;
     }
 
-    public void setEnd(Object end) {
+    public void setEnd(Date end) {
         this.end.set(end);
     }
 
@@ -155,6 +155,11 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
                 System.out.println("Status can't be deleted.");
                 break;
         }
+    }
+
+    @Override
+    public String toString() {
+        return getGroup() + getActivity() + getMandatory() + getStart() + getPlannedEnd() + getEnd() + getResponsible() + getStatus();
     }
 }
 

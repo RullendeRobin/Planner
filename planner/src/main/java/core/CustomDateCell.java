@@ -11,7 +11,7 @@ import java.time.format.FormatStyle;
 import java.util.Date;
 
 public class CustomDateCell extends JFXTreeTableCell<DataEntry, Date> {
-    private DatePicker datePicker;
+    protected DatePicker datePicker;
     public CustomDateCell() {
     }
     @Override
@@ -31,6 +31,7 @@ public class CustomDateCell extends JFXTreeTableCell<DataEntry, Date> {
         setText(getDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)));
         setGraphic(null);
     }
+
     @Override
     public void updateItem(Date item, boolean empty) {
         super.updateItem(item, empty);
@@ -59,16 +60,21 @@ public class CustomDateCell extends JFXTreeTableCell<DataEntry, Date> {
         datePicker = new DatePicker(getDate());
         datePicker.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
         datePicker.setOnAction((e) -> {
-            System.out.println("Committed: " + datePicker.getValue().toString());
-            commitEdit(Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            if (datePicker.getValue() != null) {
+
+                System.out.println("Committed: " + datePicker.getValue().toString());
+                commitEdit(Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            } else {
+                commitEdit(null);
+            }
         });
         datePicker.focusedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
-            if (!newValue) {
+            if (!newValue && datePicker.getValue() != null) {
                 commitEdit(Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
             }
         });
     }
-    private LocalDate getDate() {
+    protected LocalDate getDate() {
         return getItem() == null ?  LocalDate.now() : getItem().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
     }
