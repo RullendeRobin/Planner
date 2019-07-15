@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import core.DataEntry;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.*;
 import java.util.Date;
@@ -13,15 +14,25 @@ import java.util.logging.Logger;
 
 public class Connector {
 
+    // SQL queries
     private static final String sqlSelect = "SELECT * FROM Activities";
     private static final String sqlInsert = "INSERT INTO Activities (GroupName, Activity, Mandatory, PlannedStart, PlannedEnd, Completion, Responsible, CurrStatus) "
             + "VALUES (?,?,?,?,?,?,?,?)";
-    private static final String sqlDelete = "DELETE FROM Activities WHERE Activity = ? AND PlannedStart = ?";
+    private static final String sqlDelete = "DELETE FROM Activities WHERE ID = ?";
+    public static final String groupUpdate = "UPDATE Activities SET GroupName = ? WHERE ID = ?";
+    public static final String activityUpdate = "UPDATE Activities SET Activity = ? WHERE ID = ?";
+    public static final String mandatoryUpdate = "UPDATE Activities SET Mandatory = ? WHERE ID = ?";
+    public static final String startUpdate = "UPDATE Activities SET PlannedStart = ? WHERE ID = ?";
+    public static final String endUpdate = "UPDATE Activities SET Completion = ? WHERE ID = ?";
+    public static final String responsibleUpdate = "UPDATE Activities SET Responsible = ? WHERE ID = ?";
+    public static final String statusUpdate = "UPDATE Activities SET CurrStatus = ? WHERE ID = ?";
 
-    private static HikariConfig config = new HikariConfig();
+    public static final String plannedEndUpdate = "UPDATE Activities SET PlannedEnd = ? WHERE ID = ?";
+
     private static HikariDataSource ds;
     private static boolean autoUpdate = false;
 
+    // Database information
     private final String hostName = "plannersqlserver.database.windows.net"; // set server address
     private final String dbName = "plannerDatabase"; // set database name
     private final String user = "zephyradmin"; // set database username
@@ -31,16 +42,12 @@ public class Connector {
 
 
 
-
+    // Constructor
     public Connector() {
         ds = getDataSource();
     }
 
-    private static Connection getConnection() throws SQLException {
-        return ds.getConnection();
-    }
-
-
+    // Sets up the datasource using a HikariConfig with the database information
     private HikariDataSource getDataSource() {
         HikariConfig config = new HikariConfig();
         config.setMaximumPoolSize(10);
@@ -53,28 +60,37 @@ public class Connector {
         return new HikariDataSource(config);  //pass in HikariConfig to HikariDataSource
     }
 
+    //Gets the connection for the HikariDataSource
+    private static Connection getConnection() throws SQLException {
+        return ds.getConnection();
+    }
+
+    // Queries the database for all the rows in the Activities-table and return them as an ObservableList
     public static ObservableList<DataEntry> getData() {
 
         PreparedStatement statement = null;
         DataEntry entry = null;
         ObservableList<DataEntry> obsList = FXCollections.observableArrayList();
 
+        // Request connection from pool
         try (Connection connection = getConnection()) {
 
             connection.setAutoCommit(false);
+
             // Execute a SQL statement.
             statement = connection.prepareStatement(sqlSelect);
             ResultSet rs = statement.executeQuery();
             connection.commit();
 
-                // Save results from select statement
+                // Loop through results from the select query and add results to a list
                 while (rs.next()) {
 
+                    //Setup dates with the correct format (java.util.Date)
                     Date d1 = convertToUtilDate(rs.getDate(5));
                     Date d2 = convertToUtilDate(rs.getDate(6));
                     Date d3 = convertToUtilDate(rs.getDate(7));
 
-                    entry = new DataEntry(rs.getString(2), rs.getString(3), rs.getString(4), d1, d2, d3, rs.getString(8), rs.getString(9));
+                    entry = new DataEntry(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), d1, d2, d3, rs.getString(8), rs.getString(9));
                     obsList.add(entry);
                 }
 
@@ -87,7 +103,8 @@ public class Connector {
         return obsList;
     }
 
-    public void insertData(DataEntry entry) {
+    // Inserts a new DataEntry into the database
+    public static void insertData(DataEntry entry) {
 
         PreparedStatement statement = null;
 
@@ -113,7 +130,8 @@ public class Connector {
         }
     }
 
-    public void deleteData(DataEntry entry) {
+    // Deletes given DataEntry in the database
+    public static void deleteData(DataEntry entry) {
 
         PreparedStatement statement = null;
 
@@ -122,8 +140,7 @@ public class Connector {
             connection.setAutoCommit(false);
             statement = connection.prepareStatement(sqlDelete);
 
-            statement.setString(1, entry.getActivity());
-            statement.setDate(2, convertToSQLDate(entry.getStart()));
+            statement.setInt(1, entry.getId());
 
             statement.executeUpdate();
             connection.commit();
@@ -131,6 +148,54 @@ public class Connector {
 
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    // Updates a value in a DataEntry with the given newValue and query
+    public static void updateData(Object newValue, DataEntry entry, String query) {
+
+        PreparedStatement statement = null;
+
+        try (Connection connection = getConnection()){
+
+            setAutoUpdate(false);
+            connection.setAutoCommit(false);
+            statement = connection.prepareStatement(query);
+
+            // Checks which query is given to make sure parameters are set with the correct type
+            switch (query){
+                case endUpdate:
+                    statement.setDate(1, convertToSQLDate((Date) newValue));
+                    statement.setInt(2, entry.getId());
+
+                    PreparedStatement statement2 = connection.prepareStatement(statusUpdate);
+                    if (newValue == null) {
+                        statement2.setString(1, "Incomplete");
+                    } else {
+                        statement2.setString(1, "Complete");
+                    }
+                    statement2.setInt(2, entry.getId());
+                    statement2.executeUpdate();
+                    break;
+                case startUpdate:
+                case plannedEndUpdate:
+                    statement.setDate(1, convertToSQLDate((Date) newValue));
+                    statement.setInt(2, entry.getId());
+                    break;
+                default:
+                    statement.setString(1, (String) newValue);
+                    statement.setInt(2, entry.getId());
+                    break;
+            }
+
+            statement.executeUpdate();
+            connection.commit();
+            System.out.println("updateData");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            setAutoUpdate(true);
         }
     }
 
@@ -157,6 +222,7 @@ public class Connector {
     // autoUpdate boolean must true for loop to run
     public static void autoUpdate(ObservableList<DataEntry> data) {
 
+
         java.util.TimerTask task = new java.util.TimerTask() {
             @Override
             public void run() {
@@ -165,10 +231,14 @@ public class Connector {
 
                     ObservableList<DataEntry> temp = getData();
 
-                    if (!data.toString().equals(temp.toString())) {
+                    if (!data.equals(temp)) {
+                        System.out.println(temp.toString());
+                        System.out.println(data.toString());
+                        System.out.println("Difference: " + StringUtils.difference(data.toString(), temp.toString()));
+
                         data.clear();
                         data.addAll(temp);
-                        System.out.println("Data updated.");
+
                     }
                 }
             }

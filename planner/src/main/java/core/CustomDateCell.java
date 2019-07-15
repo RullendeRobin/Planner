@@ -1,5 +1,6 @@
 package core;
 
+import com.jfoenix.controls.JFXDatePicker;
 import com.jfoenix.controls.cells.editors.base.JFXTreeTableCell;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.DatePicker;
@@ -57,7 +58,7 @@ public class CustomDateCell extends JFXTreeTableCell<DataEntry, Date> {
 
 
     private void createDatePicker() {
-        datePicker = new DatePicker(getDate());
+        datePicker = new JFXDatePicker(getDate());
         datePicker.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
         datePicker.setOnAction((e) -> {
             if (datePicker.getValue() != null) {

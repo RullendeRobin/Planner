@@ -26,6 +26,8 @@ import server.Connector;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Date;
@@ -35,16 +37,17 @@ public class Controller implements Initializable {
 
     @FXML
     private JFXTreeTableView<DataEntry> table;
-
-    ObservableList<DataEntry> data;
+    private ObservableList<DataEntry> data;
     private TreeItem<DataEntry> root;
 
     private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
     private ContextMenu contextMenu;
-    private TreeTableCell currentCell;
+    private Tooltip tp;
+    private TreeTableCell<DataEntry, Object> currentCell;
 
-    private Connector conn;
+    private JFXTreeTableColumn<DataEntry, Date> plannedEnd;
 
+    // Methods used by the buttons in PlannerOverview.fxml to filter the data
     @FXML
     private void handleSummary() {
         filterChanged("");
@@ -100,9 +103,8 @@ public class Controller implements Initializable {
         filterChanged("Revision");
     }
 
-
     @FXML
-    private void handleOnKeyPressed(KeyEvent event) throws ParseException {
+    private void handleOnKeyPressed(KeyEvent event) {
 
         Date d1 = null;
         Date d2 = null;
@@ -120,13 +122,18 @@ public class Controller implements Initializable {
 
         if (event.getCode().equals(KeyCode.A)) {
             data.clear();
-            data.addAll(conn.getData());
+            data.addAll(Connector.getData());
             System.out.println("Fetched data");
         } else if (event.getCode().equals(KeyCode.S)) {
-            conn.insertData(de2);
+            Connector.insertData(de2);
             System.out.println("Uploaded data");
         } else if (event.getCode().equals(KeyCode.D)) {
-            filterChanged("");
+
+            plannedEnd.setSortType(TreeTableColumn.SortType.ASCENDING);
+            table.getSortOrder().clear();
+            table.getSortOrder().add(plannedEnd);
+
+            table.sort();
         } else if (event.getCode().equals(KeyCode.ESCAPE)) {
             Platform.exit();
             System.exit(0);
@@ -136,6 +143,8 @@ public class Controller implements Initializable {
 
     private void filterChanged(String filter) {
         if (filter.isEmpty()) {
+            TreeItem<DataEntry> filteredRoot = new TreeItem<>();
+            System.out.println(LocalDate.now().plusDays(3));
             table.setRoot(root);
         }
         else {
@@ -152,12 +161,11 @@ public class Controller implements Initializable {
 
     private void filter(TreeItem<DataEntry> root, String filter, TreeItem<DataEntry> filteredRoot) {
         for (TreeItem<DataEntry> child : root.getChildren()) {
-            System.out.println(child.getValue().getGroup());
             TreeItem<DataEntry> filteredChild = new TreeItem<>();
             filteredChild.setValue(child.getValue());
             filteredChild.setExpanded(true);
             filter(child, filter, filteredChild );
-            if (!filteredChild.getChildren().isEmpty() || isMatch(filteredChild.getValue(), filter)) {
+            if (!filteredChild.getChildren().isEmpty() || daysUntilMatch(filteredChild.getValue(), 0)) {
                 System.out.println(filteredChild.getValue() + " matches.");
                 filteredRoot.getChildren().add(filteredChild);
             }
@@ -168,12 +176,28 @@ public class Controller implements Initializable {
         return value.getGroup().equals(filter);
     }
 
+    private boolean daysUntilMatch(DataEntry value, int days) {
+        Date d = Date.from(LocalDate.now().plusDays(days).atStartOfDay(ZoneId.systemDefault()).toInstant());
+        return value.getPlannedEnd().before(d) && value.getEnd() == null;
+    }
+
+
+
     @SuppressWarnings("Duplicates")
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
-        conn = new Connector();
+        new Connector();
 
+        /*
+        JFXTreeTableColumn<DataEntry, Integer> id = new JFXTreeTableColumn<>("id");
+        id.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<DataEntry, Integer>, ObservableValue<Integer>>() {
+            @Override
+            public ObservableValue<Integer> call(TreeTableColumn.CellDataFeatures<DataEntry, Integer> param) {
+                return param.getValue().getValue().idProperty().asObject();
+            }
+        });
+        */
         //Create all columns
         JFXTreeTableColumn<DataEntry, String> group = new JFXTreeTableColumn<>("Group");
         group.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<DataEntry, String>, ObservableValue<String>>() {
@@ -182,7 +206,6 @@ public class Controller implements Initializable {
                 return param.getValue().getValue().groupProperty();
             }
         });
-
 
         JFXTreeTableColumn<DataEntry, String> activity = new JFXTreeTableColumn<>("Activity");
         activity.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<DataEntry, String>, ObservableValue<String>>() {
@@ -208,7 +231,7 @@ public class Controller implements Initializable {
             }
         });
 
-        JFXTreeTableColumn<DataEntry, Date> plannedEnd = new JFXTreeTableColumn<>("   Planned \nCompletion");
+        plannedEnd = new JFXTreeTableColumn<>("   Planned \nCompletion");
         plannedEnd.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<DataEntry, Date>, ObservableValue<Date>>() {
             @Override
             public ObservableValue<Date> call(TreeTableColumn.CellDataFeatures<DataEntry, Date> param) {
@@ -241,12 +264,13 @@ public class Controller implements Initializable {
         });
 
         data = FXCollections.observableArrayList();
-        root = new RecursiveTreeItem<DataEntry>(data, RecursiveTreeObject::getChildren);
+        root = new RecursiveTreeItem<>(data, RecursiveTreeObject::getChildren);
 
         table.getColumns().setAll(group, activity, mandatory, start, plannedEnd, end, responsible, status);
         table.setEditable(true);
         table.setRoot(root);
         table.setShowRoot(false);
+
 
         int i = 0;
         for (TreeTableColumn col : table.getColumns()) {
@@ -268,7 +292,7 @@ public class Controller implements Initializable {
         groupComboList.add("Accounting");
         groupComboList.add("Revision");
 
-        //Cellfactory for the group-column, with a custom combobox-cell
+        //Cell factory for the group-column, with a custom combobox-cell
         Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>> groupCellFactory =
                 new Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>>() {
                     @Override
@@ -284,7 +308,7 @@ public class Controller implements Initializable {
         mandatoryComboList.add("Yes");
         mandatoryComboList.add("No");
 
-        //Cellfactory for the mandatory-column, with a custom combobox-cell
+        //Cell factory for the mandatory-column, with a custom combobox-cell
         Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>> mandatoryCellFactory =
                 new Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>>() {
                     @Override
@@ -335,117 +359,124 @@ public class Controller implements Initializable {
                     }
                 };
 
-        Callback<TreeTableColumn<DataEntry, Date>, TreeTableCell<DataEntry, Date>> completeDateCellFactory =
-                new Callback<TreeTableColumn<DataEntry, Date>, TreeTableCell<DataEntry, Date>>() {
-                    @Override
-                    public TreeTableCell<DataEntry, Date> call(TreeTableColumn jfxTreeTableColumn) {
-                        CustomDateCell cell = new CustomDateCell() {
-                            @Override
-                            public void updateItem(Date item, boolean empty) {
-                                super.updateItem(item, empty);
-                                if (empty) {
-                                    setText(null);
-                                    setGraphic(null);
-                                } else {
-                                    if (isEditing()) {
-                                        if (datePicker != null) {
-                                            datePicker.setValue(getDate());
-                                        }
-                                        setText(null);
-                                        setGraphic(datePicker);
-                                    } else if (item == null) {
-                                        setText(null);
-                                        setGraphic(null);
-                                        data.get(this.getIndex()).setStatus("Incomplete");
-                                    } else {
-                                        setText(getDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)));
-                                        setGraphic(null);
-                                        data.get(this.getIndex()).setStatus("Complete");
 
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void cancelEdit() {
-                                super.cancelEdit();
-                                //setText((getDate().toString()));
-                                setText(getDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)));
-                                setGraphic(null);
-                                data.get(this.getIndex()).setStatus("Complete");
-                            }
-                        };
-                        cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
-                        return cell;
-                    }
-                };
-
-        //Cellfactory for columns containing strings, with a custom string-cell
+        //Cell factory for columns containing strings, with a custom string-cell
         Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>> stringCellFactory =
                 new Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>>() {
+
                     @Override
                     public TreeTableCell<DataEntry, String> call(TreeTableColumn jfxTreeTableColumn) {
+
                         CustomStringCell cell = new CustomStringCell();
+                        tp = new Tooltip();
+
                         cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
+                        cell.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
+                            if (cell.getText() == null) {
+                                Tooltip.uninstall(cell, tp);
+                            } else {
+                                tp.setText(cell.getText());
+                                Tooltip.install(cell, tp);
+                            }
+                        });
+
                         return cell;
                     }
                 };
 
-        //Settings factories for all the columns
+        // Settings factories for all the columns
         group.setCellFactory(groupCellFactory);
         activity.setCellFactory(stringCellFactory);
         mandatory.setCellFactory(mandatoryCellFactory);
         start.setCellFactory(dateCellFactory);
         plannedEnd.setCellFactory(dateCellFactory);
-        end.setCellFactory(completeDateCellFactory);
+        end.setCellFactory(dateCellFactory);
         responsible.setCellFactory(stringCellFactory);
         status.setCellFactory(statusCellFactory);
 
+        // Queries the database with any changes made whenever the commitEdit() method is called by a cell
+        group.setOnEditCommit(evt -> Connector.updateData(evt.getNewValue(), table.getSelectionModel().getSelectedItem().getValue(), Connector.groupUpdate));
+        activity.setOnEditCommit(evt -> Connector.updateData(evt.getNewValue(), table.getSelectionModel().getSelectedItem().getValue(), Connector.activityUpdate));
+        mandatory.setOnEditCommit(evt -> Connector.updateData(evt.getNewValue(), table.getSelectionModel().getSelectedItem().getValue(), Connector.mandatoryUpdate));
+        start.setOnEditCommit(evt -> Connector.updateData(evt.getNewValue(), table.getSelectionModel().getSelectedItem().getValue(), Connector.startUpdate));
+        plannedEnd.setOnEditCommit(evt -> Connector.updateData(evt.getNewValue(), table.getSelectionModel().getSelectedItem().getValue(), Connector.plannedEndUpdate));
+        end.setOnEditCommit(evt -> Connector.updateData(evt.getNewValue(), table.getSelectionModel().getSelectedItem().getValue(), Connector.endUpdate));
+        responsible.setOnEditCommit(evt -> Connector.updateData(evt.getNewValue(), table.getSelectionModel().getSelectedItem().getValue(), Connector.responsibleUpdate));
+        status.setOnEditCommit(evt -> Connector.updateData(evt.getNewValue(), table.getSelectionModel().getSelectedItem().getValue(), Connector.statusUpdate));
 
-        //Initialize rightclick-/contextmenu
+
+
+
+        // Initialize contextmenu
         initContextMenu();
 
+        // Sets autoUpdate boolean to true and starts the autoUpdate method in Connector
         Connector.setAutoUpdate(true);
-        conn.autoUpdate(data);
+        Connector.autoUpdate(data);
     }
 
+    // Creates a contextmenu and fills it with items
     private void initContextMenu() {
         contextMenu = new ContextMenu();
-        MenuItem item1 = new MenuItem("Delete cell");
+        MenuItem item1 = new MenuItem("Delete content of cell");
         item1.setOnAction((action) -> {
             try {
-                String id = currentCell.getId();
-                table.getSelectionModel().getSelectedItem().getValue().setNull(id);
+                deleteContent(currentCell);
             } catch (NullPointerException e) {
                 System.out.println("No cell selected.");
             }
         });
         MenuItem item2 = new MenuItem("Delete row");
-        item2.setOnAction((action) -> {
-            conn.deleteData(table.getSelectionModel().getSelectedItem().getValue());
-        });
-        contextMenu.getItems().addAll(item1, item2);
+        item2.setOnAction((action) -> Connector.deleteData(table.getSelectionModel().getSelectedItem().getValue()));
+
+        MenuItem separator = new SeparatorMenuItem();
+        contextMenu.getItems().addAll(item1, separator, item2);
     }
 
+    // Gets the correct coordinates of the mouse and displays the contextmenu
     public void showContextMenu(MouseEvent event) {
         if (event.getButton() == MouseButton.SECONDARY ) {
-            System.out.println(event.getSource().getClass());
             contextMenu.show(table, table.localToScreen(table.getBoundsInLocal()).getMinX()+ event.getX(),
                     table.localToScreen(table.getBoundsInLocal()).getMinY() + event.getY());
-
         }
     }
+
+    private void deleteContent(TreeTableCell cell) {
+        int columnId = Integer.parseInt(cell.getId());
+        switch (columnId) {
+            case 0:
+            case 2:
+            case 7:
+                System.out.println("This cell can't be deleted.");
+                break;
+            default:
+                currentCell.startEdit();
+                currentCell.commitEdit(null);
+        }
+    }
+
 
     class MyEventHandler implements EventHandler<MouseEvent> {
 
         @Override
         public void handle(MouseEvent t) {
-            if (t.getButton() == MouseButton.SECONDARY ){
+
+            if (t.getButton() == MouseButton.SECONDARY){
                 try {
+
                     currentCell = (TreeTableCell) t.getSource();
+                    currentCell.getTreeTableRow().getTreeItem().getValue();
+                    contextMenu.getItems().get(0).setDisable(false);
+                    contextMenu.getItems().get(2).setDisable(false);
+
                 } catch (NullPointerException e) {
                     System.out.println("Nullpointer");
+                    contextMenu.getItems().get(0).setDisable(true);
+                    contextMenu.getItems().get(2).setDisable(true);
                 }
+            } else {
+                contextMenu.hide();
+
             }
         }
     }

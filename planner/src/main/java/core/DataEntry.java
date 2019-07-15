@@ -1,15 +1,15 @@
 package core;
 
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
+
 import java.util.Date;
+import java.util.Objects;
 
 //Model-class for data that will be displayed in the table
 public class DataEntry extends RecursiveTreeObject<DataEntry> {
 
+    private IntegerProperty id;
     private StringProperty group;
     private StringProperty activity;
     private StringProperty mandatory;
@@ -20,6 +20,19 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
     private StringProperty status;
 
     public DataEntry(String group, String activity, String mandatory, Date start, Date plannedEnd, Date end, String responsible, String status) {
+        this.id = new SimpleIntegerProperty(0);
+        this.group = new SimpleStringProperty(group);
+        this.activity = new SimpleStringProperty(activity);
+        this.mandatory = new SimpleStringProperty(mandatory);
+        this.start = new SimpleObjectProperty<>(start);
+        this.plannedEnd = new SimpleObjectProperty<>(plannedEnd);
+        this.end = new SimpleObjectProperty<>(end);
+        this.responsible = new SimpleStringProperty(responsible);
+        this.status = new SimpleStringProperty(status);
+    }
+
+    public DataEntry(int id, String group, String activity, String mandatory, Date start, Date plannedEnd, Date end, String responsible, String status) {
+        this.id = new SimpleIntegerProperty(id);
         this.group = new SimpleStringProperty(group);
         this.activity = new SimpleStringProperty(activity);
         this.mandatory = new SimpleStringProperty(mandatory);
@@ -31,6 +44,18 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
     }
 
     //Below are all the getters and setters for the properties
+    public int getId() {
+        return id.get();
+    }
+
+    public IntegerProperty idProperty() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id.set(id);
+    }
+
     public String getGroup() {
         return group.get();
     }
@@ -127,39 +152,34 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
         this.status.set(status);
     }
 
-    public void setNull(String id) {
-        int i = Integer.parseInt(id);
-        switch (i) {
-            case 0:
-                System.out.println("Group can't be deleted.");
-                break;
-            case 1:
-                setActivity(null);
-                break;
-            case 2:
-                System.out.println("Mandatory can't be deleted.");
-                break;
-            case 3:
-                setStart(null);
-                break;
-            case 4:
-                setPlannedEnd(null);
-                break;
-            case 5:
-                setEnd(null);
-                break;
-            case 6:
-                setResponsible(null);
-                break;
-            case 7:
-                System.out.println("Status can't be deleted.");
-                break;
+    @Override
+    public String toString() {
+        return getGroup() + " " + getActivity() + " " + getMandatory() + " " + getStart() + " "
+                + getPlannedEnd() + " " + getEnd() + " " + getResponsible() + " " + getStatus();
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (o == this) return true;
+        if (!(o instanceof DataEntry)) {
+            return false;
         }
+        DataEntry entry = (DataEntry) o;
+        return Objects.equals(group.getValue(), entry.group.getValue()) &&
+                Objects.equals(activity.getValue(), entry.activity.getValue()) &&
+                Objects.equals(mandatory.getValue(), entry.mandatory.getValue()) &&
+                Objects.equals(start.get(), entry.start.get()) &&
+                Objects.equals(plannedEnd.get(), entry.plannedEnd.get()) &&
+                Objects.equals(end.get(), entry.end.get()) &&
+                Objects.equals(responsible.getValue(), entry.responsible.getValue()) &&
+                Objects.equals(status.getValue(), entry.status.getValue());
     }
 
     @Override
-    public String toString() {
-        return getGroup() + getActivity() + getMandatory() + getStart() + getPlannedEnd() + getEnd() + getResponsible() + getStatus();
+    public int hashCode() {
+        return Objects.hash(group, activity, mandatory, start, plannedEnd, end, responsible, status);
     }
 }
 

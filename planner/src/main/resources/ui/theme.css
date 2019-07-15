@@ -102,6 +102,11 @@
     -fx-background-color:  derive(-fx-primary, 20%);
 }
 
+.context-menu > * > .separator > .line {
+    -fx-border-color: #4b77dd;
+    -fx-border-insets: 0;
+}
+
 /*Hamburger Styling*/
 .jfx-hamburger-icon{
     -fx-spacing: 7;
@@ -345,6 +350,14 @@
     -fx-border-width: 0 0 1.5 0;
     -fx-border-color: white;
 }
+.jfx-date-picker .jfx-text-field{
+    -jfx-unfocus-color: -fx-primary;
+}
+
+.jfx-date-picker {
+    -jfx-default-color: -fx-primary;
+}
+
 .tree-table-row-cell:selected {
     -fx-background-color: rgba(103, 236, 255, 0.19);
 }
