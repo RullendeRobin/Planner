@@ -18,6 +18,7 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
     private ObjectProperty<Date> end;
     private StringProperty responsible;
     private StringProperty status;
+    private DoubleProperty progress;
 
     public DataEntry(String group, String activity, String mandatory, Date start, Date plannedEnd, Date end, String responsible, String status) {
         this.id = new SimpleIntegerProperty(0);
@@ -29,6 +30,7 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
         this.end = new SimpleObjectProperty<>(end);
         this.responsible = new SimpleStringProperty(responsible);
         this.status = new SimpleStringProperty(status);
+        this.progress = new SimpleDoubleProperty(calculateProgress(start, plannedEnd));
     }
 
     public DataEntry(int id, String group, String activity, String mandatory, Date start, Date plannedEnd, Date end, String responsible, String status) {
@@ -41,6 +43,7 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
         this.end = new SimpleObjectProperty<>(end);
         this.responsible = new SimpleStringProperty(responsible);
         this.status = new SimpleStringProperty(status);
+        this.progress = new SimpleDoubleProperty(calculateProgress(start, plannedEnd));
     }
 
     //Below are all the getters and setters for the properties
@@ -96,7 +99,7 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
         return start.get();
     }
 
-    public ObjectProperty startProperty() {
+    public ObjectProperty<Date> startProperty() {
         return start;
     }
 
@@ -108,7 +111,7 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
         return plannedEnd.get();
     }
 
-    public ObjectProperty plannedEndProperty() {
+    public ObjectProperty<Date> plannedEndProperty() {
         return plannedEnd;
     }
 
@@ -120,7 +123,7 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
         return end.get();
     }
 
-    public ObjectProperty endProperty() {
+    public ObjectProperty<Date> endProperty() {
         return end;
     }
 
@@ -152,12 +155,23 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
         this.status.set(status);
     }
 
+    public double getProgress() {
+        return progress.get();
+    }
+
+    public DoubleProperty progressProperty() {
+        return progress;
+    }
+
+    public void setProgress(double l) {
+        this.progress.set(l);
+    }
+
     @Override
     public String toString() {
         return getGroup() + " " + getActivity() + " " + getMandatory() + " " + getStart() + " "
                 + getPlannedEnd() + " " + getEnd() + " " + getResponsible() + " " + getStatus();
     }
-
 
     @Override
     public boolean equals(Object o) {
@@ -181,5 +195,24 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
     public int hashCode() {
         return Objects.hash(group, activity, mandatory, start, plannedEnd, end, responsible, status);
     }
+
+
+    private double calculateProgress(Date start, Date plannedEnd) {
+        if (start == null || plannedEnd == null) {
+            return 0;
+        }
+        long totalMinutes = plannedEnd.getTime() - start.getTime();
+        long currentMinutes = new Date().getTime() - start.getTime();
+        double percentage = totalMinutes == 0 ? 1 : (double) currentMinutes/totalMinutes;
+        if (percentage < 0) {
+            return 0;
+        } else if (percentage > 1) {
+            return 1;
+        } else {
+            return percentage;
+        }
+    }
+
+
 }
 

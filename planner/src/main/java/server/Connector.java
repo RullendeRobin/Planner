@@ -232,8 +232,6 @@ public class Connector {
                     ObservableList<DataEntry> temp = getData();
 
                     if (!data.equals(temp)) {
-                        System.out.println(temp.toString());
-                        System.out.println(data.toString());
                         System.out.println("Difference: " + StringUtils.difference(data.toString(), temp.toString()));
 
                         data.clear();

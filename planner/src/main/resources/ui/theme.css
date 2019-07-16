@@ -37,10 +37,10 @@
 
 .text-field
 {
-    -fx-text-fill: -fx-primarytext;
+    /*-fx-text-fill: -fx-primarytext;*/
     -fx-font-size : 10pt;
     -jfx-focus-color: -fx-secondary;
-    -fx-text-fill: derive(-fx-primary, 20%);
+    /*-fx-text-fill: derive(-fx-primary, 20%);*/
 }
 
 /*Login Screen Specific*/
@@ -221,7 +221,7 @@
     -fx-text-fill: white;
 }
 .table-row-cell:focused, .table-cell:focused{
-    -fx-text-fill: -fx-primary;
+    /*-fx-text-fill: -fx-primary*/
 }
 .table-row-cell{
     -fx-background-color: -fx-primary;
@@ -236,11 +236,11 @@
 }
 .table-row-cell:selected {
     -fx-background-color: -fx-secondary;
-    -fx-text-fill: -fx-primary;
+    /*-fx-text-fill: -fx-primary;*/
     -fx-background-insets: 0;
 }
 .table-row-cell:selected .table-cell{
-    -fx-text-fill: -fx-primary;
+    /*-fx-text-fill: -fx-primary;*/
 }
 .placeholder .label{
     -fx-text-fill: white;
@@ -264,7 +264,7 @@
     -fx-background-radius: 5em;
 }
 .table-view .filler{
-    -fx-fill: -fx-primary;
+    /*-fx-fill: -fx-primary;*/
     -fx-background-color: -fx-primary;
 }
 .table-context
@@ -311,12 +311,9 @@
 
 /*Progrss bar*/
 
-.progress-bar-main .track{
+.progress-bar .bar{
     -fx-background-color: -fx-primary;
-}
-.progress-bar-main .bar{
-    -fx-background-color: -fx-secondary;
-    -fx-padding: 5px;
+    -fx-padding: 8px;
 }
 
 .common-label{
@@ -352,11 +349,14 @@
 }
 .jfx-date-picker .jfx-text-field{
     -jfx-unfocus-color: -fx-primary;
+    -jfx-focus-color: #4059a9
 }
 
 .jfx-date-picker {
     -jfx-default-color: -fx-primary;
+
 }
+
 
 .tree-table-row-cell:selected {
     -fx-background-color: rgba(103, 236, 255, 0.19);

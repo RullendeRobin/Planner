@@ -95,7 +95,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        NewMain
+                                        Main
                                     </mainClass>
                                 </manifest>
                             </archive>

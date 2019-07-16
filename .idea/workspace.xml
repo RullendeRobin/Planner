@@ -2,43 +2,47 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cdb932d9-7e58-4d94-93a9-e7b232ef17da" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_apache_commons_commons_lang3_3_8_1.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/planner/src/main/java/ui/AddEntryController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/planner/src/main/resources/ui/About.fxml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/planner/src/main/resources/ui/zephyr_logo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/planner/src/main/resources/ui/zephyr_logo16x16.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/planner/src/main/resources/ui/zephyr_logo32x32.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/planner/src/main/resources/ui/zephyr_logo64x64.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/planner.iml" beforeDir="false" afterPath="$PROJECT_DIR$/planner/planner.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/planner/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/planner/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/src/main/java/core/CustomDateCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/planner/src/main/java/core/CustomDateCell.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/src/main/java/core/CustomStringCell.java" beforeDir="false" afterPath="$PROJECT_DIR$/planner/src/main/java/core/CustomStringCell.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/src/main/java/NewMain.java" beforeDir="false" afterPath="$PROJECT_DIR$/planner/src/main/java/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/planner/src/main/java/core/DataEntry.java" beforeDir="false" afterPath="$PROJECT_DIR$/planner/src/main/java/core/DataEntry.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/planner/src/main/java/server/Connector.java" beforeDir="false" afterPath="$PROJECT_DIR$/planner/src/main/java/server/Connector.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/src/main/java/ui/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/planner/src/main/java/ui/Controller.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/src/main/java/ui/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/planner/src/main/java/ui/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/src/main/resources/ui/test2.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/planner/src/main/resources/ui/PlannerOverview.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/src/main/java/ui/Controller.java" beforeDir="false" afterPath="$PROJECT_DIR$/planner/src/main/java/ui/OverviewController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/src/main/java/ui/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/src/main/resources/ui/NewEntry.fxml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/src/main/resources/ui/PlannerOverview.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/planner/src/main/resources/ui/PlannerOverview.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/planner/src/main/resources/ui/theme.css" beforeDir="false" afterPath="$PROJECT_DIR$/planner/src/main/resources/ui/theme.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/core/CustomDateCell.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/core/CustomDateCell.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/core/CustomStringCell.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/core/CustomStringCell.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/NewMain.class" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/planner/target/classes/core/DataEntry.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/core/DataEntry.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/planner/target/classes/server/Connector$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/server/Connector$1.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/planner/target/classes/server/Connector.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/server/Connector.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/Controller$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$10.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/Controller$10.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$11$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/Controller$11$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$11.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/Controller$11.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$12.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/Controller$12.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$13$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/Controller$13$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$13.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/Controller$13.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$14.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/Controller$14.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$2.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/Controller$2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$3.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/Controller$3.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$4.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/Controller$4.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$5.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/Controller$5.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$6.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/Controller$6.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$7.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/Controller$7.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$8.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/Controller$8.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$9.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/Controller$9.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$MyEventHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/Controller$MyEventHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/Controller.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/test2.fxml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$10.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$11$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$11.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$12.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$13$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$13.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$14.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$2.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$3.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$4.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$5.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$6.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$7.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$8.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$9.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller$MyEventHandler.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Controller.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/Main.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/NewEntry.fxml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/PlannerOverview.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/PlannerOverview.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/planner/target/classes/ui/theme.css" beforeDir="false" afterPath="$PROJECT_DIR$/planner/target/classes/ui/theme.css" afterDir="false" />
     </list>
     <ignored path="JavaFxApplication.iws" />
@@ -115,10 +119,46 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/planner/src/main/java/ui/Controller.java">
+        <entry file="file://$PROJECT_DIR$/planner/src/main/java/ui/OverviewController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="340">
-              <caret line="519" column="50" selection-start-line="519" selection-start-column="50" selection-end-line="519" selection-end-column="50" />
+            <state relative-caret-position="25">
+              <caret line="135" selection-start-line="135" selection-end-line="135" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="method#showAddEntry#0;class#OverviewController#0" />
+                <element signature="method#showAddEntry#1;class#OverviewController#0" />
+                <element signature="e#8002#8003#0" expanded="true" />
+                <element signature="e#19193#19194#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/planner/src/main/resources/ui/About.fxml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="119">
+              <caret line="7" selection-start-line="7" selection-end-line="7" />
+            </state>
+          </provider>
+          <provider editor-type-id="JavaFX-Scene-Builder" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/planner/src/main/resources/ui/PlannerOverview.fxml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="169">
+              <caret line="60" column="53" selection-start-line="60" selection-start-column="53" selection-end-line="60" selection-end-column="53" />
+            </state>
+          </provider>
+          <provider editor-type-id="JavaFX-Scene-Builder" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/planner/src/main/java/ui/AddEntryController.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="225">
+              <caret line="48" column="26" selection-start-line="48" selection-start-column="26" selection-end-line="48" selection-end-column="26" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -127,13 +167,28 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/planner/src/main/java/Main.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="34">
+              <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+              <folding>
+                <element signature="e#67#68#0" expanded="true" />
+                <element signature="e#101#102#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/planner/src/main/java/server/Connector.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-561">
-              <caret line="164" column="96" selection-start-line="164" selection-start-column="96" selection-end-line="164" selection-end-column="96" />
+            <state relative-caret-position="1341">
+              <caret line="233" column="45" selection-start-line="233" selection-start-column="45" selection-end-line="233" selection-end-column="45" />
               <folding>
                 <element signature="imports" expanded="true" />
+                <element signature="e#8511#8512#0" expanded="true" />
                 <element signature="e#8544#8545#0" expanded="true" />
+                <element signature="e#8604#8605#0" expanded="true" />
                 <element signature="e#8653#8654#0" expanded="true" />
               </folding>
             </state>
@@ -143,8 +198,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/planner/src/main/resources/ui/theme.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="6001">
-              <caret line="353" column="35" selection-start-line="353" selection-start-column="35" selection-end-line="353" selection-end-column="35" />
+            <state relative-caret-position="228">
+              <caret line="351" column="29" selection-start-line="351" selection-start-column="29" selection-end-line="351" selection-end-column="29" />
             </state>
           </provider>
         </entry>
@@ -152,7 +207,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/planner/src/main/java/core/CustomStringCell.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="335">
+            <state relative-caret-position="680">
               <caret line="64" selection-start-line="64" selection-end-line="64" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -164,19 +219,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/11.0.2/javafx-controls-11.0.2-win.jar!/javafx/scene/control/TreeTableCell.class">
+        <entry file="file://$PROJECT_DIR$/planner/src/main/java/core/CustomDateCell.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="480">
-              <caret line="232" column="16" selection-start-line="232" selection-start-column="16" selection-end-line="232" selection-end-column="16" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/planner/src/main/java/core/DataEntry.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="82">
-              <caret line="153" selection-start-line="153" selection-end-line="153" />
+            <state relative-caret-position="290">
+              <caret line="60" column="33" selection-start-line="60" selection-start-column="33" selection-end-line="60" selection-end-column="33" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -185,19 +231,15 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/com/microsoft/sqlserver/mssql-jdbc/7.2.2.jre11/mssql-jdbc-7.2.2.jre11.jar!/com/microsoft/sqlserver/jdbc/SQLServerDataSource.class">
+        <entry file="file://$PROJECT_DIR$/planner/src/main/java/core/DataEntry.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="102">
-              <caret line="26" column="13" selection-start-line="26" selection-start-column="13" selection-end-line="26" selection-end-column="13" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/planner/pom.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="867">
-              <caret line="51" selection-start-line="51" selection-end-line="51" />
+            <state relative-caret-position="2499">
+              <caret line="205" selection-start-line="205" selection-end-line="205" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#2901#2902#0" expanded="true" />
+                <element signature="e#2946#2947#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -208,16 +250,13 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="CSS File" />
-        <option value="FxmlFile" />
         <option value="Class" />
+        <option value="FxmlFile" />
       </list>
     </option>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>width</find>
-      <find>-fx-secondary</find>
-      <find>yello</find>
       <find>text-fie</find>
       <find>row</find>
       <find>root</find>
@@ -241,6 +280,13 @@
       <find>connector</find>
       <find>menu</find>
       <find>Connec</find>
+      <find>setid</find>
+      <find>text</find>
+      <find>calc</find>
+      <find>progre</find>
+      <find>main</find>
+      <find>date</find>
+      <find>system.out</find>
     </findStrings>
   </component>
   <component name="FindManager">
@@ -268,15 +314,19 @@
         <option value="$PROJECT_DIR$/src/app/ui/resources/test2.fxml" />
         <option value="$PROJECT_DIR$/src/app/ui/Controller.java" />
         <option value="$PROJECT_DIR$/planner/src/main/java/ui/Main.java" />
-        <option value="$PROJECT_DIR$/planner/src/main/java/NewMain.java" />
         <option value="$PROJECT_DIR$/planner/src/main/resources/ui/test2.fxml" />
         <option value="$PROJECT_DIR$/planner/src/main/java/core/CustomDateCell.java" />
-        <option value="$PROJECT_DIR$/planner/src/main/resources/ui/theme.css" />
         <option value="$PROJECT_DIR$/planner/src/main/java/core/CustomStringCell.java" />
-        <option value="$PROJECT_DIR$/planner/pom.xml" />
-        <option value="$PROJECT_DIR$/planner/src/main/java/server/Connector.java" />
         <option value="$PROJECT_DIR$/planner/src/main/java/core/DataEntry.java" />
+        <option value="$PROJECT_DIR$/planner/src/main/java/NewMain.java" />
+        <option value="$PROJECT_DIR$/planner/src/main/java/server/Connector.java" />
+        <option value="$PROJECT_DIR$/planner/src/main/java/Main.java" />
+        <option value="$PROJECT_DIR$/planner/pom.xml" />
         <option value="$PROJECT_DIR$/planner/src/main/java/ui/Controller.java" />
+        <option value="$PROJECT_DIR$/planner/src/main/java/ui/AddEntryController.java" />
+        <option value="$PROJECT_DIR$/planner/src/main/resources/ui/theme.css" />
+        <option value="$PROJECT_DIR$/planner/src/main/resources/ui/About.fxml" />
+        <option value="$PROJECT_DIR$/planner/src/main/java/ui/OverviewController.java" />
       </list>
     </option>
   </component>
@@ -296,8 +346,8 @@
   </component>
   <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="265" />
-    <option name="y" value="25" />
+    <option name="x" value="191" />
+    <option name="y" value="81" />
     <option name="width" value="1615" />
     <option name="height" value="880" />
   </component>
@@ -311,7 +361,6 @@
     </navigator>
     <panes>
       <pane id="PackagesPane" />
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -380,6 +429,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -394,7 +444,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="dynamic.classpath" value="false" />
-    <property name="last_opened_file_path" value="C:/Java/JFoenix/jfoenix-9.0.8.jar!/" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/planner/src/main/resources/ui" />
     <property name="list.type.of.created.stylesheet" value="CSS" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="project.structure.last.edited" value="Project" />
@@ -407,6 +457,9 @@
   <component name="RecentsManager">
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="ui" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\RobinAlexanderFinsta\IdeaProjects\Planner\planner\src\main\resources\ui" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\RobinAlexanderFinsta\IdeaProjects\Planner\planner\src\main\resources\ui" />
@@ -459,7 +512,7 @@
       </method>
     </configuration>
     <configuration name="Main" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="NewMain" />
+      <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="planner" />
       <extension name="coverage">
         <pattern>
@@ -557,12 +610,13 @@
       <workItem from="1562829519787" duration="16844000" />
       <workItem from="1562952852985" duration="20490000" />
       <workItem from="1563008581940" duration="7945000" />
-      <workItem from="1563176477025" duration="10719000" />
+      <workItem from="1563176477025" duration="15967000" />
+      <workItem from="1563258042700" duration="18895000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="206982000" />
+    <option name="totallyTimeSpent" value="231125000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -577,7 +631,7 @@
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.6703755" visible="true" weight="0.1375839" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.6703755" visible="true" weight="0.22416107" />
       <window_info id="Structure" order="1" weight="0.24899329" />
       <window_info id="Favorites" order="2" />
       <window_info id="Designer" order="3" />
@@ -586,7 +640,7 @@
       <window_info id="UI Designer" order="6" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3286119" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.16572239" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.27620396" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.50141644" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -600,7 +654,7 @@
       <window_info anchor="bottom" id="Messages" order="13" weight="0.32577905" />
       <window_info anchor="bottom" id="Docker" order="14" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="15" />
-      <window_info anchor="bottom" id="Terminal" order="16" weight="0.1529745" />
+      <window_info anchor="bottom" id="Terminal" order="16" weight="0.20254958" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -671,16 +725,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/app/ui/ListController.java" />
-    <entry file="file://$PROJECT_DIR$/src/app/ui/resources/ListView.fxml" />
-    <entry file="file://$PROJECT_DIR$/src/app/ui/resources/idk.fxml" />
-    <entry file="jar://C:/Java/javafx-sdk-11.0.2/lib/javafx.fxml.jar!/javafx/fxml/FXMLLoader.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="164">
-          <caret line="456" selection-start-line="456" selection-end-line="456" />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://C:/Java/javafx-sdk-11.0.2/lib/javafx.base.jar!/javafx/util/Callback.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
@@ -719,27 +763,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/planner/src/main/java/ui/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="8" column="37" selection-start-line="8" selection-start-column="26" selection-end-line="8" selection-end-column="37" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/planner/src/main/java/NewMain.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="23" selection-start-line="2" selection-start-column="23" selection-end-line="2" selection-end-column="23" />
-          <folding>
-            <element signature="e#67#68#0" expanded="true" />
-            <element signature="e#101#102#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/planner/planner.iml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="255">
@@ -760,14 +783,6 @@
           <caret line="52" column="1" selection-start-line="52" selection-start-column="1" selection-end-line="62" selection-end-column="41" />
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/planner/src/main/resources/ui/PlannerOverview.fxml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-22">
-          <caret line="16" column="14" selection-start-line="16" selection-start-column="14" selection-end-line="16" selection-end-column="14" />
-        </state>
-      </provider>
-      <provider editor-type-id="JavaFX-Scene-Builder" />
     </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-graphics/11.0.2/javafx-graphics-11.0.2-win.jar!/javafx/scene/Node.class">
       <provider selected="true" editor-type-id="text-editor">
@@ -964,17 +979,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/planner/src/main/resources/ui/theme.css">
+    <entry file="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/11.0.2/javafx-controls-11.0.2-win.jar!/javafx/scene/control/TreeTableCell.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="6001">
-          <caret line="353" column="35" selection-start-line="353" selection-start-column="35" selection-end-line="353" selection-end-column="35" />
+        <state relative-caret-position="3383">
+          <caret line="232" column="16" selection-start-line="232" selection-start-column="16" selection-end-line="232" selection-end-column="16" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/planner/src/main/java/core/CustomDateCell.java">
+    <entry file="file://$PROJECT_DIR$/planner/src/main/java/ui/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="867">
-          <caret line="60" column="33" selection-start-line="60" selection-start-column="33" selection-end-line="60" selection-end-column="33" />
+        <state relative-caret-position="238">
+          <caret line="14" column="25" lean-forward="true" selection-start-line="14" selection-start-column="25" selection-end-line="14" selection-end-column="25" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -983,49 +998,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/planner/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="867">
-          <caret line="51" selection-start-line="51" selection-end-line="51" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/11.0.2/javafx-controls-11.0.2-win.jar!/javafx/scene/control/TreeTableCell.class">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="480">
-          <caret line="232" column="16" selection-start-line="232" selection-start-column="16" selection-end-line="232" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/planner/src/main/java/core/CustomStringCell.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="335">
-          <caret line="64" selection-start-line="64" selection-end-line="64" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#2346#2347#0" expanded="true" />
-            <element signature="e#2403#2404#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/planner/src/main/java/core/DataEntry.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="82">
-          <caret line="153" selection-start-line="153" selection-end-line="153" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/planner/src/main/java/server/Connector.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-561">
-          <caret line="164" column="96" selection-start-line="164" selection-start-column="96" selection-end-line="164" selection-end-column="96" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#8544#8545#0" expanded="true" />
-            <element signature="e#8653#8654#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="85">
+          <caret line="71" column="40" selection-start-line="71" selection-start-column="40" selection-end-line="71" selection-end-column="40" />
         </state>
       </provider>
     </entry>
@@ -1036,12 +1010,124 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/planner/src/main/java/ui/Controller.java">
+    <entry file="file://$PROJECT_DIR$/planner/src/main/resources/ui/AddEntry.fxml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="519" column="50" selection-start-line="519" selection-start-column="50" selection-end-line="519" selection-end-column="50" />
+        <state relative-caret-position="255">
+          <caret line="15" column="48" lean-forward="true" selection-start-line="15" selection-start-column="48" selection-end-line="15" selection-end-column="48" />
+        </state>
+      </provider>
+      <provider editor-type-id="JavaFX-Scene-Builder" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/planner/src/main/java/core/DataEntry.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2499">
+          <caret line="205" selection-start-line="205" selection-end-line="205" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#2901#2902#0" expanded="true" />
+            <element signature="e#2946#2947#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/planner/src/main/java/core/CustomStringCell.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="680">
+          <caret line="64" selection-start-line="64" selection-end-line="64" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#2346#2347#0" expanded="true" />
+            <element signature="e#2403#2404#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/planner/src/main/java/core/CustomDateCell.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="290">
+          <caret line="60" column="33" selection-start-line="60" selection-start-column="33" selection-end-line="60" selection-end-column="33" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/planner/src/main/java/server/Connector.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1341">
+          <caret line="233" column="45" selection-start-line="233" selection-start-column="45" selection-end-line="233" selection-end-column="45" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#8511#8512#0" expanded="true" />
+            <element signature="e#8544#8545#0" expanded="true" />
+            <element signature="e#8604#8605#0" expanded="true" />
+            <element signature="e#8653#8654#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/planner/src/main/resources/ui/AddEntry.fxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret line="20" column="25" selection-start-line="20" selection-start-column="25" selection-end-line="20" selection-end-column="25" />
+        </state>
+      </provider>
+      <provider editor-type-id="JavaFX-Scene-Builder" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/planner/src/main/java/ui/AddEntryController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="48" column="26" selection-start-line="48" selection-start-column="26" selection-end-line="48" selection-end-column="26" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/planner/src/main/resources/ui/theme.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="228">
+          <caret line="351" column="29" selection-start-line="351" selection-start-column="29" selection-end-line="351" selection-end-column="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/planner/src/main/java/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" column="13" selection-start-line="2" selection-start-column="13" selection-end-line="2" selection-end-column="13" />
+          <folding>
+            <element signature="e#67#68#0" expanded="true" />
+            <element signature="e#101#102#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/planner/src/main/resources/ui/About.fxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="7" selection-start-line="7" selection-end-line="7" />
+        </state>
+      </provider>
+      <provider editor-type-id="JavaFX-Scene-Builder" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/planner/src/main/resources/ui/PlannerOverview.fxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="169">
+          <caret line="60" column="53" selection-start-line="60" selection-start-column="53" selection-end-line="60" selection-end-column="53" />
+        </state>
+      </provider>
+      <provider editor-type-id="JavaFX-Scene-Builder" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/planner/src/main/java/ui/OverviewController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="25">
+          <caret line="135" selection-start-line="135" selection-end-line="135" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#showAddEntry#0;class#OverviewController#0" />
+            <element signature="method#showAddEntry#1;class#OverviewController#0" />
+            <element signature="e#8002#8003#0" expanded="true" />
+            <element signature="e#19193#19194#0" expanded="true" />
           </folding>
         </state>
       </provider>

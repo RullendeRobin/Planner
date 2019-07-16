@@ -7,33 +7,37 @@ import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import core.CustomDateCell;
 import core.CustomStringCell;
 import core.DataEntry;
+import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.ComboBoxTreeTableCell;
+import javafx.scene.control.cell.ProgressBarTreeTableCell;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import server.Connector;
 
 import java.net.URL;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.Date;
 import java.util.ResourceBundle;
 
-public class Controller implements Initializable {
+public class OverviewController extends Application implements Initializable {
 
     @FXML
     private JFXTreeTableView<DataEntry> table;
@@ -46,128 +50,184 @@ public class Controller implements Initializable {
     private TreeTableCell<DataEntry, Object> currentCell;
 
     private JFXTreeTableColumn<DataEntry, Date> plannedEnd;
+    private ObservableList<String> groupComboList;
+    private ObservableList<String> responsibleComboList;
+
+    @Override
+    public void start(Stage primaryStage) throws Exception{
+        Parent root = FXMLLoader.load(getClass().getResource("PlannerOverview.fxml"));
+        primaryStage.setTitle("Planner");
+        primaryStage.setScene(new Scene(root));
+        primaryStage.getIcons().addAll(
+                new Image(getClass().getResourceAsStream("zephyr_logo16x16.png")),
+                new Image(getClass().getResourceAsStream("zephyr_logo32x32.png")),
+                new Image(getClass().getResourceAsStream("zephyr_logo64x64.png")));
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        Application.launch(args);
+    }
 
     // Methods used by the buttons in PlannerOverview.fxml to filter the data
     @FXML
     private void handleSummary() {
-        filterChanged("");
+        filterChanged("10", true);
+        sortPlannedEnd();
     }
 
     @FXML
     private void handleFinance() {
-        filterChanged("Finance");
+        filterChanged("Finance", false);
     }
 
     @FXML
     private void handleAssets() {
-        filterChanged("Assets");
+        filterChanged("Assets", false);
     }
 
     @FXML
     private void handleHSE() {
-        filterChanged("HSE");
+        filterChanged("HSE", false);
     }
 
     @FXML
     private void handleStakeholders() {
-        filterChanged("Stakeholders");
+        filterChanged("Stakeholders", false);
     }
 
     @FXML
     private void handleAuthorities() {
-        filterChanged("Authorities");
+        filterChanged("Authorities", false);
     }
 
     @FXML
     private void handleGrid() {
-        filterChanged("Grid");
+        filterChanged("Grid", false);
     }
 
     @FXML
     private void handleCivil() {
-        filterChanged("Civil");
+        filterChanged("Civil", false);
     }
 
     @FXML
     private void handleInsurance() {
-        filterChanged("Insurance");
+        filterChanged("Insurance", false);
     }
 
     @FXML
     private void handleAccounting() {
-        filterChanged("Accounting");
+        filterChanged("Accounting", false);
     }
 
     @FXML
     private void handleRevision() {
-        filterChanged("Revision");
+        filterChanged("Revision", false);
     }
 
     @FXML
     private void handleOnKeyPressed(KeyEvent event) {
 
-        Date d1 = null;
-        Date d2 = null;
-        try {
-            d1 = format.parse("2019-05-05");
-            d2 = format.parse("2019-06-01");
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        DataEntry de1 = new DataEntry("Finance", "Pay alimony", "Yes", new Date(), new Date(), null, "Robin Finstad", "Incomplete");
         DataEntry de2 = new DataEntry("Finance", "Gather investors", "No", new Date(), new Date(), null, "Ola Nordmann", "Incomplete");
-        DataEntry de3 = new DataEntry("Accounting", "Update bank details", "Yes", new Date(), d1, d2, "Kari Nordmann", "Complete");
-
 
         if (event.getCode().equals(KeyCode.A)) {
-            data.clear();
-            data.addAll(Connector.getData());
-            System.out.println("Fetched data");
+            filterChanged("", false);
         } else if (event.getCode().equals(KeyCode.S)) {
             Connector.insertData(de2);
             System.out.println("Uploaded data");
         } else if (event.getCode().equals(KeyCode.D)) {
-
             plannedEnd.setSortType(TreeTableColumn.SortType.ASCENDING);
             table.getSortOrder().clear();
             table.getSortOrder().add(plannedEnd);
-
             table.sort();
+        } else if (event.getCode().equals(KeyCode.F)) {
+            showAddEntry();
         } else if (event.getCode().equals(KeyCode.ESCAPE)) {
             Platform.exit();
             System.exit(0);
         }
     }
 
+    public void showAddEntry() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("AddEntry.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
 
-    private void filterChanged(String filter) {
+            AddEntryController controller = fxmlLoader.getController();
+            controller.setGroupComboList(groupComboList);
+            controller.setResponsibleComboList(responsibleComboList);
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Add entry");
+            stage.setScene(new Scene(root1));
+            stage.setResizable(false);
+            stage.getIcons().addAll(
+                    new Image(getClass().getResourceAsStream("zephyr_logo16x16.png")),
+                    new Image(getClass().getResourceAsStream("zephyr_logo32x32.png")),
+                    new Image(getClass().getResourceAsStream("zephyr_logo64x64.png")));
+            stage.show();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void showAbout() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("About.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+
+            AddEntryController controller = fxmlLoader.getController();
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("About");
+            stage.setScene(new Scene(root1));
+            stage.setResizable(false);
+            stage.getIcons().addAll(
+                    new Image(getClass().getResourceAsStream("zephyr_logo16x16.png")),
+                    new Image(getClass().getResourceAsStream("zephyr_logo32x32.png")),
+                    new Image(getClass().getResourceAsStream("zephyr_logo64x64.png")));
+            stage.show();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sortPlannedEnd() {
+        plannedEnd.setSortType(TreeTableColumn.SortType.ASCENDING);
+        table.getSortOrder().clear();
+        table.getSortOrder().add(plannedEnd);
+        table.sort();
+    }
+
+    private void filterChanged(String filter, boolean filterDates) {
         if (filter.isEmpty()) {
-            TreeItem<DataEntry> filteredRoot = new TreeItem<>();
-            System.out.println(LocalDate.now().plusDays(3));
             table.setRoot(root);
         }
         else {
-            System.out.println(root.getChildren());
             TreeItem<DataEntry> filteredRoot = new TreeItem<>();
-            filter(root, filter, filteredRoot);
+            filter(root, filter, filteredRoot, filterDates);
             table.setRoot(filteredRoot);
-            System.out.println("Root has been filtered.");
-            System.out.println(filteredRoot.getChildren());
-            System.out.println(table.getRoot());
 
         }
     }
 
-    private void filter(TreeItem<DataEntry> root, String filter, TreeItem<DataEntry> filteredRoot) {
+    private void filter(TreeItem<DataEntry> root, String filter, TreeItem<DataEntry> filteredRoot, boolean filterDates) {
         for (TreeItem<DataEntry> child : root.getChildren()) {
             TreeItem<DataEntry> filteredChild = new TreeItem<>();
             filteredChild.setValue(child.getValue());
             filteredChild.setExpanded(true);
-            filter(child, filter, filteredChild );
-            if (!filteredChild.getChildren().isEmpty() || daysUntilMatch(filteredChild.getValue(), 0)) {
-                System.out.println(filteredChild.getValue() + " matches.");
-                filteredRoot.getChildren().add(filteredChild);
+            filter(child, filter, filteredChild, filterDates);
+            if (filterDates) {
+                if (!filteredChild.getChildren().isEmpty() || daysUntilMatch(filteredChild.getValue(), filter)) {
+                    filteredRoot.getChildren().add(filteredChild);
+                }
+            } else {
+                if (!filteredChild.getChildren().isEmpty() || isMatch(filteredChild.getValue(), filter)) {
+                    filteredRoot.getChildren().add(filteredChild);
+                }
             }
         }
     }
@@ -176,9 +236,9 @@ public class Controller implements Initializable {
         return value.getGroup().equals(filter);
     }
 
-    private boolean daysUntilMatch(DataEntry value, int days) {
-        Date d = Date.from(LocalDate.now().plusDays(days).atStartOfDay(ZoneId.systemDefault()).toInstant());
-        return value.getPlannedEnd().before(d) && value.getEnd() == null;
+    private boolean daysUntilMatch(DataEntry value, String days) {
+        Date date = Date.from(LocalDate.now().plusDays(Integer.parseInt(days)).atStartOfDay(ZoneId.systemDefault()).toInstant());
+        return value.getPlannedEnd().before(date) && value.getEnd() == null;
     }
 
 
@@ -189,84 +249,33 @@ public class Controller implements Initializable {
 
         new Connector();
 
-        /*
-        JFXTreeTableColumn<DataEntry, Integer> id = new JFXTreeTableColumn<>("id");
-        id.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<DataEntry, Integer>, ObservableValue<Integer>>() {
-            @Override
-            public ObservableValue<Integer> call(TreeTableColumn.CellDataFeatures<DataEntry, Integer> param) {
-                return param.getValue().getValue().idProperty().asObject();
-            }
-        });
-        */
-        //Create all columns
+        // Create all columns
         JFXTreeTableColumn<DataEntry, String> group = new JFXTreeTableColumn<>("Group");
-        group.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<DataEntry, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<DataEntry, String> param) {
-                return param.getValue().getValue().groupProperty();
-            }
-        });
-
         JFXTreeTableColumn<DataEntry, String> activity = new JFXTreeTableColumn<>("Activity");
-        activity.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<DataEntry, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<DataEntry, String> param) {
-                return param.getValue().getValue().activityProperty();
-            }
-        });
-
         JFXTreeTableColumn<DataEntry, String> mandatory = new JFXTreeTableColumn<>("Mandatory");
-        mandatory.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<DataEntry, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<DataEntry, String> param) {
-                return param.getValue().getValue().mandatoryProperty();
-            }
-        });
-
         JFXTreeTableColumn<DataEntry, Date> start = new JFXTreeTableColumn<>("Planned Start");
-        start.setCellValueFactory(new Callback<JFXTreeTableColumn.CellDataFeatures<DataEntry, Date>, ObservableValue<Date>>() {
-            @Override
-            public ObservableValue<Date> call(JFXTreeTableColumn.CellDataFeatures<DataEntry, Date> param) {
-                return param.getValue().getValue().startProperty();
-            }
-        });
-
         plannedEnd = new JFXTreeTableColumn<>("   Planned \nCompletion");
-        plannedEnd.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<DataEntry, Date>, ObservableValue<Date>>() {
-            @Override
-            public ObservableValue<Date> call(TreeTableColumn.CellDataFeatures<DataEntry, Date> param) {
-                return param.getValue().getValue().plannedEndProperty();
-            }
-        });
-
         JFXTreeTableColumn<DataEntry, Date> end = new JFXTreeTableColumn<>("Completion");
-        end.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<DataEntry, Date>, ObservableValue<Date>>() {
-            @Override
-            public ObservableValue<Date> call(TreeTableColumn.CellDataFeatures<DataEntry, Date> param) {
-                return param.getValue().getValue().endProperty();
-            }
-        });
-
         JFXTreeTableColumn<DataEntry, String> responsible = new JFXTreeTableColumn<>("Responsible");
-        responsible.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<DataEntry, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<DataEntry, String> param) {
-                return param.getValue().getValue().responsibleProperty();
-            }
-        });
-
         JFXTreeTableColumn<DataEntry, String> status = new JFXTreeTableColumn<>("Status");
-        status.setCellValueFactory(new Callback<TreeTableColumn.CellDataFeatures<DataEntry, String>, ObservableValue<String>>() {
-            @Override
-            public ObservableValue<String> call(TreeTableColumn.CellDataFeatures<DataEntry, String> param) {
-                return param.getValue().getValue().statusProperty();
-            }
-        });
+        JFXTreeTableColumn<DataEntry, Double> progress = new JFXTreeTableColumn<>("Progress");
+
+        // Binding together the cells value with the corresponding value in a DateEntry
+        group.setCellValueFactory(param -> param.getValue().getValue().groupProperty());
+        activity.setCellValueFactory(param -> param.getValue().getValue().activityProperty());
+        mandatory.setCellValueFactory(param -> param.getValue().getValue().mandatoryProperty());
+        start.setCellValueFactory(param -> param.getValue().getValue().startProperty());
+        plannedEnd.setCellValueFactory(param -> param.getValue().getValue().plannedEndProperty());
+        end.setCellValueFactory(param -> param.getValue().getValue().endProperty());
+        responsible.setCellValueFactory(param -> param.getValue().getValue().responsibleProperty());
+        status.setCellValueFactory(param -> param.getValue().getValue().statusProperty());
+        progress.setCellValueFactory(param -> param.getValue().getValue().progressProperty().asObject());
+
 
         data = FXCollections.observableArrayList();
         root = new RecursiveTreeItem<>(data, RecursiveTreeObject::getChildren);
 
-        table.getColumns().setAll(group, activity, mandatory, start, plannedEnd, end, responsible, status);
+        table.getColumns().setAll(group, activity, mandatory, start, plannedEnd, end, responsible, /*progress,*/ status);
         table.setEditable(true);
         table.setRoot(root);
         table.setShowRoot(false);
@@ -279,8 +288,8 @@ public class Controller implements Initializable {
             i++;
         }
 
-        //List with options for the group-combobox
-        ObservableList<String> groupComboList = FXCollections.observableArrayList();
+        // List with options for the group-combobox
+        groupComboList = FXCollections.observableArrayList();
         groupComboList.add("Finance");
         groupComboList.add("Assets");
         groupComboList.add("HSE");
@@ -292,44 +301,48 @@ public class Controller implements Initializable {
         groupComboList.add("Accounting");
         groupComboList.add("Revision");
 
-        //Cell factory for the group-column, with a custom combobox-cell
+        // Cell factory for the group-column, with a custom combobox-cell
         Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>> groupCellFactory =
-                new Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>>() {
-                    @Override
-                    public TreeTableCell<DataEntry, String> call(TreeTableColumn jfxTreeTableColumn) {
-                        ComboBoxTreeTableCell cell = new ComboBoxTreeTableCell<>(groupComboList);
-                        cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
-                        return cell;
-                    }
+                jfxTreeTableColumn -> {
+                    ComboBoxTreeTableCell<DataEntry, String> cell = new ComboBoxTreeTableCell<>(groupComboList);
+                    cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
+                    return cell;
                 };
 
-        //List with options for the mandatory-combobox
+        // List with options for the mandatory-combobox
         ObservableList<String> mandatoryComboList = FXCollections.observableArrayList();
         mandatoryComboList.add("Yes");
         mandatoryComboList.add("No");
 
-        //Cell factory for the mandatory-column, with a custom combobox-cell
+        // Cell factory for the mandatory-column, with a custom combobox-cell
         Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>> mandatoryCellFactory =
-                new Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>>() {
-                    @Override
-                    public TreeTableCell<DataEntry, String> call(TreeTableColumn jfxTreeTableColumn) {
-                        ComboBoxTreeTableCell cell = new ComboBoxTreeTableCell<>(mandatoryComboList);
-                        cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
-                        return cell;
-                    }
+                jfxTreeTableColumn -> {
+                    ComboBoxTreeTableCell<DataEntry, String> cell = new ComboBoxTreeTableCell<>(mandatoryComboList);
+                    cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
+                    return cell;
                 };
 
-        //List with options for the status-combobox
+        Callback<TreeTableColumn<DataEntry, Double>, TreeTableCell<DataEntry, Double>> progressCellFactory =
+                jfxTreeTableColumn -> {
+                    ProgressBarTreeTableCell<DataEntry> cell = new ProgressBarTreeTableCell<>();
+                    cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
+                    return cell;
+                };
+
+        responsibleComboList = FXCollections.observableArrayList();
+        responsibleComboList.addAll("Robin Finstad", "Bjarne Bjørnson", "Arne Arnfinn", "Ola Nordmann", "Kari Nordmann");
+
+        // List with options for the status-combobox
         ObservableList<String> statusComboList = FXCollections.observableArrayList();
         statusComboList.add("Complete");
         statusComboList.add("Incomplete");
 
-        //Cellfactory for the status-column, with a custom combobox-cell
+        // Cell factory for the status-column, with a custom combobox-cell
         Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>> statusCellFactory =
-                new Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>>() {
+                new Callback<>() {
                     @Override
                     public TreeTableCell<DataEntry, String> call(TreeTableColumn jfxTreeTableColumn) {
-                        ComboBoxTreeTableCell cell = new ComboBoxTreeTableCell<>(statusComboList) {
+                        ComboBoxTreeTableCell<DataEntry, String> cell = new ComboBoxTreeTableCell<>(statusComboList) {
                             @Override
                             public void updateItem(String item, boolean empty) {
                                 super.updateItem(item, empty);
@@ -348,43 +361,36 @@ public class Controller implements Initializable {
 
                 };
 
-        //Cellfactory for columns containing dates, with a custom date-cell
+        // Cell factory for columns containing dates, with a custom date-cell
          Callback<TreeTableColumn<DataEntry, Date>, TreeTableCell<DataEntry, Date>> dateCellFactory =
-                new Callback<TreeTableColumn<DataEntry, Date>, TreeTableCell<DataEntry, Date>>() {
-                    @Override
-                    public TreeTableCell<DataEntry, Date> call(TreeTableColumn jfxTreeTableColumn) {
-                        CustomDateCell cell = new CustomDateCell();
-                        cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
-                        return cell;
-                    }
-                };
+                 jfxTreeTableColumn -> {
+                     CustomDateCell cell = new CustomDateCell();
+                     cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
+                     return cell;
+                 };
 
 
-        //Cell factory for columns containing strings, with a custom string-cell
+        // Cell factory for columns containing strings, with a custom string-cell
         Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>> stringCellFactory =
-                new Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>>() {
+                jfxTreeTableColumn -> {
 
-                    @Override
-                    public TreeTableCell<DataEntry, String> call(TreeTableColumn jfxTreeTableColumn) {
+                    CustomStringCell cell = new CustomStringCell();
+                    tp = new Tooltip();
 
-                        CustomStringCell cell = new CustomStringCell();
-                        tp = new Tooltip();
+                    cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
+                    cell.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
+                        if (cell.getText() == null) {
+                            Tooltip.uninstall(cell, tp);
+                        } else {
+                            tp.setText(cell.getText());
+                            Tooltip.install(cell, tp);
+                        }
+                    });
 
-                        cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
-                        cell.addEventFilter(MouseEvent.MOUSE_ENTERED, event -> {
-                            if (cell.getText() == null) {
-                                Tooltip.uninstall(cell, tp);
-                            } else {
-                                tp.setText(cell.getText());
-                                Tooltip.install(cell, tp);
-                            }
-                        });
-
-                        return cell;
-                    }
+                    return cell;
                 };
 
-        // Settings factories for all the columns
+        // Assigning cell factories to all the columns
         group.setCellFactory(groupCellFactory);
         activity.setCellFactory(stringCellFactory);
         mandatory.setCellFactory(mandatoryCellFactory);
@@ -393,6 +399,7 @@ public class Controller implements Initializable {
         end.setCellFactory(dateCellFactory);
         responsible.setCellFactory(stringCellFactory);
         status.setCellFactory(statusCellFactory);
+        progress.setCellFactory(progressCellFactory);
 
         // Queries the database with any changes made whenever the commitEdit() method is called by a cell
         group.setOnEditCommit(evt -> Connector.updateData(evt.getNewValue(), table.getSelectionModel().getSelectedItem().getValue(), Connector.groupUpdate));
@@ -419,7 +426,7 @@ public class Controller implements Initializable {
     private void initContextMenu() {
         contextMenu = new ContextMenu();
         MenuItem item1 = new MenuItem("Delete content of cell");
-        item1.setOnAction((action) -> {
+        item1.setOnAction(event -> {
             try {
                 deleteContent(currentCell);
             } catch (NullPointerException e) {
@@ -427,10 +434,13 @@ public class Controller implements Initializable {
             }
         });
         MenuItem item2 = new MenuItem("Delete row");
-        item2.setOnAction((action) -> Connector.deleteData(table.getSelectionModel().getSelectedItem().getValue()));
+        item2.setOnAction(event -> deleteRow());
+
+        MenuItem item3 = new MenuItem("New entry");
+        item3.setOnAction(event -> showAddEntry());
 
         MenuItem separator = new SeparatorMenuItem();
-        contextMenu.getItems().addAll(item1, separator, item2);
+        contextMenu.getItems().addAll(item3, item1, separator, item2);
     }
 
     // Gets the correct coordinates of the mouse and displays the contextmenu
@@ -438,6 +448,14 @@ public class Controller implements Initializable {
         if (event.getButton() == MouseButton.SECONDARY ) {
             contextMenu.show(table, table.localToScreen(table.getBoundsInLocal()).getMinX()+ event.getX(),
                     table.localToScreen(table.getBoundsInLocal()).getMinY() + event.getY());
+        }
+    }
+
+    public void deleteRow() {
+        try {
+            Connector.deleteData(table.getSelectionModel().getSelectedItem().getValue());
+        } catch (NullPointerException e) {
+            System.out.println("No row selected");
         }
     }
 
@@ -455,6 +473,11 @@ public class Controller implements Initializable {
         }
     }
 
+    public void close() {
+        Platform.exit();
+        System.exit(0);
+    }
+
 
     class MyEventHandler implements EventHandler<MouseEvent> {
 
@@ -463,10 +486,14 @@ public class Controller implements Initializable {
 
             if (t.getButton() == MouseButton.SECONDARY){
                 try {
-
                     currentCell = (TreeTableCell) t.getSource();
-                    currentCell.getTreeTableRow().getTreeItem().getValue();
-                    contextMenu.getItems().get(0).setDisable(false);
+                    String id = currentCell.getTableColumn().getId();
+                    if (currentCell.getText() == null || id.equals("0") || id.equals("2") || id.equals("7")) {
+                        contextMenu.getItems().get(0).setDisable(true);
+                        currentCell.getTreeTableRow().getTreeItem().getValue();
+                    } else {
+                        contextMenu.getItems().get(0).setDisable(false);
+                    }
                     contextMenu.getItems().get(2).setDisable(false);
 
                 } catch (NullPointerException e) {
