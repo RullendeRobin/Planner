@@ -15,9 +15,12 @@ import java.util.logging.Logger;
 public class Connector {
 
     // SQL queries
-    private static final String sqlSelect = "SELECT * FROM Activities";
+    private static final String sqlSelectActivities = "SELECT * FROM Activities";
+    private static final String sqlSelectEmployees = "SELECT * FROM Employees";
     private static final String sqlInsert = "INSERT INTO Activities (GroupName, Activity, Mandatory, PlannedStart, PlannedEnd, Completion, Responsible, CurrStatus) "
             + "VALUES (?,?,?,?,?,?,?,?)";
+    private static final String sqlInsertEmployee = "INSERT INTO Employees (FullName) "
+            + "VALUES (?)";
     private static final String sqlDelete = "DELETE FROM Activities WHERE ID = ?";
     public static final String groupUpdate = "UPDATE Activities SET GroupName = ? WHERE ID = ?";
     public static final String activityUpdate = "UPDATE Activities SET Activity = ? WHERE ID = ?";
@@ -78,7 +81,7 @@ public class Connector {
             connection.setAutoCommit(false);
 
             // Execute a SQL statement.
-            statement = connection.prepareStatement(sqlSelect);
+            statement = connection.prepareStatement(sqlSelectActivities);
             ResultSet rs = statement.executeQuery();
             connection.commit();
 
@@ -196,6 +199,56 @@ public class Connector {
             e.printStackTrace();
         } finally {
             setAutoUpdate(true);
+        }
+    }
+
+
+    public static ObservableList<String> getEmployees() {
+        PreparedStatement statement = null;
+
+        ObservableList<String> obsList = FXCollections.observableArrayList();
+
+        // Request connection from pool
+        try (Connection connection = getConnection()) {
+
+            connection.setAutoCommit(false);
+
+            // Execute a SQL statement.
+            statement = connection.prepareStatement(sqlSelectEmployees);
+            ResultSet rs = statement.executeQuery();
+            connection.commit();
+
+            // Loop through results from the select query and add results to a list
+            while (rs.next()) {
+
+                obsList.add(rs.getString(1));
+            }
+
+        } catch (SQLException e) {
+            Logger lgr = Logger.getLogger(Connector.class.getName());
+            lgr.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
+        }
+
+        return obsList;
+    }
+
+    public static void insertEmployee(String employee) {
+
+        PreparedStatement statement = null;
+
+        try (Connection connection = getConnection()){
+
+            connection.setAutoCommit(false);
+            statement = connection.prepareStatement(sqlInsertEmployee);
+
+            statement.setString(1, employee);
+
+            statement.executeUpdate();
+            connection.commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

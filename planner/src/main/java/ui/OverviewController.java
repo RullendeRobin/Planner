@@ -4,9 +4,7 @@ import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.controls.RecursiveTreeItem;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
-import core.CustomDateCell;
-import core.CustomStringCell;
-import core.DataEntry;
+import core.*;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -73,7 +71,7 @@ public class OverviewController extends Application implements Initializable {
     @FXML
     private void handleSummary() {
         filterChanged("10", true);
-        sortPlannedEnd();
+        sortColumn(4, true);
     }
 
     @FXML
@@ -136,13 +134,6 @@ public class OverviewController extends Application implements Initializable {
         } else if (event.getCode().equals(KeyCode.S)) {
             Connector.insertData(de2);
             System.out.println("Uploaded data");
-        } else if (event.getCode().equals(KeyCode.D)) {
-            plannedEnd.setSortType(TreeTableColumn.SortType.ASCENDING);
-            table.getSortOrder().clear();
-            table.getSortOrder().add(plannedEnd);
-            table.sort();
-        } else if (event.getCode().equals(KeyCode.F)) {
-            showAddEntry();
         } else if (event.getCode().equals(KeyCode.ESCAPE)) {
             Platform.exit();
             System.exit(0);
@@ -156,7 +147,7 @@ public class OverviewController extends Application implements Initializable {
 
             AddEntryController controller = fxmlLoader.getController();
             controller.setGroupComboList(groupComboList);
-            controller.setResponsibleComboList(responsibleComboList);
+            controller.setResponsibleComboList(Connector.getEmployees());
 
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -195,10 +186,32 @@ public class OverviewController extends Application implements Initializable {
         }
     }
 
-    private void sortPlannedEnd() {
-        plannedEnd.setSortType(TreeTableColumn.SortType.ASCENDING);
+    public void showEmployees() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("ManageEmployees.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Manage employees");
+            stage.setScene(new Scene(root1));
+            stage.setResizable(false);
+            stage.getIcons().addAll(
+                    new Image(getClass().getResourceAsStream("zephyr_logo16x16.png")),
+                    new Image(getClass().getResourceAsStream("zephyr_logo32x32.png")),
+                    new Image(getClass().getResourceAsStream("zephyr_logo64x64.png")));
+            stage.show();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sortColumn(int column, boolean ascending) {
+
+        TreeTableColumn<DataEntry, ?> col = table.getColumns().get(column);
+        col.setSortType(TreeTableColumn.SortType.ASCENDING);
         table.getSortOrder().clear();
-        table.getSortOrder().add(plannedEnd);
+        table.getSortOrder().add(col);
         table.sort();
     }
 
@@ -304,7 +317,7 @@ public class OverviewController extends Application implements Initializable {
         // Cell factory for the group-column, with a custom combobox-cell
         Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>> groupCellFactory =
                 jfxTreeTableColumn -> {
-                    ComboBoxTreeTableCell<DataEntry, String> cell = new ComboBoxTreeTableCell<>(groupComboList);
+                    CustomComboBoxCell cell = new CustomComboBoxCell(groupComboList);
                     cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
                     return cell;
                 };
@@ -317,7 +330,7 @@ public class OverviewController extends Application implements Initializable {
         // Cell factory for the mandatory-column, with a custom combobox-cell
         Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>> mandatoryCellFactory =
                 jfxTreeTableColumn -> {
-                    ComboBoxTreeTableCell<DataEntry, String> cell = new ComboBoxTreeTableCell<>(mandatoryComboList);
+                    CustomComboBoxCell cell = new CustomComboBoxCell(mandatoryComboList);
                     cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
                     return cell;
                 };
@@ -329,8 +342,15 @@ public class OverviewController extends Application implements Initializable {
                     return cell;
                 };
 
-        responsibleComboList = FXCollections.observableArrayList();
-        responsibleComboList.addAll("Robin Finstad", "Bjarne Bjørnson", "Arne Arnfinn", "Ola Nordmann", "Kari Nordmann");
+        responsibleComboList = Connector.getEmployees();
+
+        Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>> responsibleCellFactory =
+                jfxTreeTableColumn -> {
+                    CustomComboBoxCell cell = new CustomComboBoxCell(responsibleComboList);
+                    cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
+                    return cell;
+                };
+
 
         // List with options for the status-combobox
         ObservableList<String> statusComboList = FXCollections.observableArrayList();
@@ -397,7 +417,7 @@ public class OverviewController extends Application implements Initializable {
         start.setCellFactory(dateCellFactory);
         plannedEnd.setCellFactory(dateCellFactory);
         end.setCellFactory(dateCellFactory);
-        responsible.setCellFactory(stringCellFactory);
+        responsible.setCellFactory(responsibleCellFactory);
         status.setCellFactory(statusCellFactory);
         progress.setCellFactory(progressCellFactory);
 
@@ -410,6 +430,8 @@ public class OverviewController extends Application implements Initializable {
         end.setOnEditCommit(evt -> Connector.updateData(evt.getNewValue(), table.getSelectionModel().getSelectedItem().getValue(), Connector.endUpdate));
         responsible.setOnEditCommit(evt -> Connector.updateData(evt.getNewValue(), table.getSelectionModel().getSelectedItem().getValue(), Connector.responsibleUpdate));
         status.setOnEditCommit(evt -> Connector.updateData(evt.getNewValue(), table.getSelectionModel().getSelectedItem().getValue(), Connector.statusUpdate));
+
+        responsible.setOnEditStart(evt -> responsibleComboList = Connector.getEmployees());
 
 
 
@@ -489,17 +511,17 @@ public class OverviewController extends Application implements Initializable {
                     currentCell = (TreeTableCell) t.getSource();
                     String id = currentCell.getTableColumn().getId();
                     if (currentCell.getText() == null || id.equals("0") || id.equals("2") || id.equals("7")) {
-                        contextMenu.getItems().get(0).setDisable(true);
+                        contextMenu.getItems().get(1).setDisable(true);
                         currentCell.getTreeTableRow().getTreeItem().getValue();
                     } else {
-                        contextMenu.getItems().get(0).setDisable(false);
+                        contextMenu.getItems().get(1).setDisable(false);
                     }
-                    contextMenu.getItems().get(2).setDisable(false);
+                    contextMenu.getItems().get(3).setDisable(false);
 
                 } catch (NullPointerException e) {
                     System.out.println("Nullpointer");
-                    contextMenu.getItems().get(0).setDisable(true);
-                    contextMenu.getItems().get(2).setDisable(true);
+                    contextMenu.getItems().get(1).setDisable(true);
+                    contextMenu.getItems().get(3).setDisable(true);
                 }
             } else {
                 contextMenu.hide();

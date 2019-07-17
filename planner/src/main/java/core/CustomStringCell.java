@@ -4,19 +4,15 @@ import com.jfoenix.controls.cells.editors.base.JFXTreeTableCell;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-import server.Connector;
 
 public class CustomStringCell extends JFXTreeTableCell<DataEntry, String> {
-    public TextField textField;
+    private TextField textField;
     private ChangeListener<? super Boolean> changeListener = (obs, ov, nv) -> {
         if (!nv) {
             commitEdit(textField.getText());
         }
     };
 
-    public CustomStringCell() {
-
-    }
 
     @Override
     public void startEdit() {
@@ -67,9 +63,7 @@ public class CustomStringCell extends JFXTreeTableCell<DataEntry, String> {
         textField = new TextField(getString());
         textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
         textField.focusedProperty().addListener(changeListener);
-        textField.setOnAction(evt -> {
-            commitEdit(textField.getText());
-        });
+        textField.setOnAction(evt -> commitEdit(textField.getText()));
 
         textField.setOnKeyPressed((ke) -> {
             if (ke.getCode().equals(KeyCode.ESCAPE)) {
