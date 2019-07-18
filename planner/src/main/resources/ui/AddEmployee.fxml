@@ -18,7 +18,7 @@
             <Insets left="20.0" right="20.0" />
          </VBox.margin>
       </JFXTextField>
-      <JFXButton fx:id="addBtn" focusTraversable="false" text="Add">
+      <JFXButton fx:id="addBtn" defaultButton="true" focusTraversable="false" text="Add">
          <VBox.margin>
             <Insets top="7.0" />
          </VBox.margin>

@@ -18,6 +18,7 @@ public class AddEmployeeController implements Initializable {
     @FXML
     private JFXTextField textField;
 
+    private EmployeeController controller;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -26,9 +27,14 @@ public class AddEmployeeController implements Initializable {
                 Connector.insertEmployee(textField.getText());
                 Stage stage = (Stage) addBtn.getScene().getWindow();
                 stage.close();
+                controller.fillListView();
             } else {
                 System.out.println("Name can't be empty.");
             }
         });
+    }
+
+    public void setController(EmployeeController controller) {
+        this.controller = controller;
     }
 }

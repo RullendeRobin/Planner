@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import com.jfoenix.controls.JFXButton?>
 <?import com.jfoenix.controls.JFXTreeTableView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.TreeTableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 
-<StackPane onKeyPressed="#handleOnKeyPressed" prefHeight="540.0" prefWidth="1020.0" stylesheets="@theme.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.OverviewController">
+<StackPane onKeyPressed="#handleOnKeyPressed" prefHeight="540.0" prefWidth="1025.0" stylesheets="@theme.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.OverviewController">
    <children>
       <BorderPane prefHeight="200.0" prefWidth="200.0">
          <top>
@@ -20,6 +21,7 @@
                 <Menu mnemonicParsing="false" text="File">
                   <items>
                     <MenuItem mnemonicParsing="false" onAction="#showEmployees" text="Manage employees" />
+                        <MenuItem mnemonicParsing="false" onAction="#showSettings" text="Settings" />
                         <MenuItem mnemonicParsing="false" onAction="#close" text="Close" />
                   </items>
                 </Menu>
@@ -38,19 +40,24 @@
             </MenuBar>
          </top>
          <bottom>
-            <HBox maxHeight="30.0" minHeight="30.0" prefHeight="30.0" prefWidth="200.0" style="-fx-background-color: #71b5ff;" BorderPane.alignment="CENTER">
+            <HBox fx:id="hbox" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" prefWidth="200.0" style="-fx-background-color: #71b5ff;" BorderPane.alignment="CENTER">
                <children>
-                  <JFXButton maxHeight="30.0" minHeight="30.0" onAction="#handleSummary" prefHeight="30.0" ripplerFill="WHITE" text="Summary" textAlignment="CENTER" textFill="WHITE" />
-                  <JFXButton onAction="#handleFinance" text="Finance" />
-                  <JFXButton onAction="#handleAssets" text="Assets" />
-                  <JFXButton onAction="#handleHSE" text="HSE" />
-                  <JFXButton onAction="#handleStakeholders" text="Stakeholders" />
-                  <JFXButton layoutX="268.0" layoutY="10.0" onAction="#handleAuthorities" text="Authorities" />
-                  <JFXButton layoutX="372.0" layoutY="10.0" onAction="#handleGrid" text="Grid" />
-                  <JFXButton layoutX="476.0" layoutY="10.0" onAction="#handleCivil" text="Civil" />
-                  <JFXButton layoutX="512.0" layoutY="10.0" onAction="#handleInsurance" text="Insurance" />
-                  <JFXButton layoutX="559.0" layoutY="10.0" onAction="#handleAccounting" text="Accounting" />
-                  <JFXButton layoutX="641.0" layoutY="10.0" onAction="#handleRevision" text="Revision" />
+                  <ToggleButton mnemonicParsing="false" onAction="#handleSummary" text="Summary">
+                     <toggleGroup>
+                        <ToggleGroup fx:id="filterGroup" />
+                     </toggleGroup>
+                  </ToggleButton>
+                  <ToggleButton layoutX="810.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleFinance" text="Finance" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="849.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleAssets" text="Assets" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="888.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleHSE" text="HSE" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="928.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleStakeholders" text="Stakeholders" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="967.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleAuthorities" text="Authorities" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="992.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleGrid" text="Grid" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="994.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleCivil" text="Civil" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="996.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleInsurance" text="Insurance" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="559.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleAccounting" text="Accounting" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="998.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleRevision" text="Revision" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="999.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleAll" selected="true" text="All" toggleGroup="$filterGroup" />
                </children>
             </HBox>
          </bottom>

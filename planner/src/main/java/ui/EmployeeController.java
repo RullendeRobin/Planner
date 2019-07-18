@@ -19,21 +19,32 @@ import java.util.ResourceBundle;
 public class EmployeeController implements Initializable {
 
     @FXML
-    private JFXListView<String> lv;
+    private JFXListView<String> listView;
 
     @FXML
     private JFXButton addBtn;
 
+    @FXML
+    private JFXButton deleteBtn;
+
+    @FXML
+    private JFXButton closeBtn;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        ObservableList<String> employees = Connector.getEmployees();
+        fillListView();
 
-        lv.setItems(employees);
+        addBtn.setOnAction(event -> showAddEmployee());
 
-        addBtn.setOnAction(event -> {
-            showAddEmployee();
+        deleteBtn.setOnAction(event -> {
+            Connector.deleteEmployee(listView.getSelectionModel().getSelectedItem());
+            fillListView();
+        });
 
+        closeBtn.setOnAction(event -> {
+            Stage stage = (Stage) closeBtn.getScene().getWindow();
+            stage.close();
         });
     }
 
@@ -43,6 +54,8 @@ public class EmployeeController implements Initializable {
             Parent root1 = (Parent) fxmlLoader.load();
 
             Stage stage = new Stage();
+            AddEmployeeController controller = fxmlLoader.getController();
+            controller.setController(this);
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("Add employee");
             stage.setScene(new Scene(root1));
@@ -55,5 +68,10 @@ public class EmployeeController implements Initializable {
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
+
+    protected void fillListView() {
+        ObservableList<String> employees = Connector.getEmployees();
+        listView.setItems(employees);
     }
 }

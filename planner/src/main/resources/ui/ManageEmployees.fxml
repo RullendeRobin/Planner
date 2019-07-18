@@ -11,7 +11,7 @@
    <children>
       <BorderPane prefHeight="200.0" prefWidth="200.0">
          <center>
-            <JFXListView fx:id="lv" BorderPane.alignment="CENTER">
+            <JFXListView fx:id="listView" BorderPane.alignment="CENTER">
                <BorderPane.margin>
                   <Insets left="15.0" right="15.0" top="15.0" />
                </BorderPane.margin></JFXListView>
@@ -24,8 +24,8 @@
                         <Insets left="10.0" />
                      </HBox.margin>
                   </JFXButton>
-                  <JFXButton focusTraversable="false" text="Delete" />
-                  <JFXButton focusTraversable="false" text="Close">
+                  <JFXButton fx:id="deleteBtn" focusTraversable="false" text="Delete" />
+                  <JFXButton fx:id="closeBtn" defaultButton="true" focusTraversable="false" text="Close">
                      <HBox.margin>
                         <Insets left="205.2" />
                      </HBox.margin>

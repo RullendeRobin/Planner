@@ -16,12 +16,9 @@ public class Connector {
 
     // SQL queries
     private static final String sqlSelectActivities = "SELECT * FROM Activities";
-    private static final String sqlSelectEmployees = "SELECT * FROM Employees";
     private static final String sqlInsert = "INSERT INTO Activities (GroupName, Activity, Mandatory, PlannedStart, PlannedEnd, Completion, Responsible, CurrStatus) "
             + "VALUES (?,?,?,?,?,?,?,?)";
-    private static final String sqlInsertEmployee = "INSERT INTO Employees (FullName) "
-            + "VALUES (?)";
-    private static final String sqlDelete = "DELETE FROM Activities WHERE ID = ?";
+    private static final String sqlDeleteEntry = "DELETE FROM Activities WHERE ID = ?";
     public static final String groupUpdate = "UPDATE Activities SET GroupName = ? WHERE ID = ?";
     public static final String activityUpdate = "UPDATE Activities SET Activity = ? WHERE ID = ?";
     public static final String mandatoryUpdate = "UPDATE Activities SET Mandatory = ? WHERE ID = ?";
@@ -29,8 +26,12 @@ public class Connector {
     public static final String endUpdate = "UPDATE Activities SET Completion = ? WHERE ID = ?";
     public static final String responsibleUpdate = "UPDATE Activities SET Responsible = ? WHERE ID = ?";
     public static final String statusUpdate = "UPDATE Activities SET CurrStatus = ? WHERE ID = ?";
-
     public static final String plannedEndUpdate = "UPDATE Activities SET PlannedEnd = ? WHERE ID = ?";
+
+    private static final String sqlSelectEmployees = "SELECT * FROM Employees";
+    private static final String sqlInsertEmployee = "INSERT INTO Employees (FullName) "
+            + "VALUES (?)";
+    private static final String sqlDeleteEmployee = "DELETE FROM Employees WHERE FullName = ?";
 
     private static HikariDataSource ds;
     private static boolean autoUpdate = false;
@@ -68,7 +69,7 @@ public class Connector {
         return ds.getConnection();
     }
 
-    // Queries the database for all the rows in the Activities-table and return them as an ObservableList
+    // Queries the database for all the rows in the Activities-table and returns them as an ObservableList
     public static ObservableList<DataEntry> getData() {
 
         PreparedStatement statement = null;
@@ -141,7 +142,7 @@ public class Connector {
         try (Connection connection = getConnection()){
 
             connection.setAutoCommit(false);
-            statement = connection.prepareStatement(sqlDelete);
+            statement = connection.prepareStatement(sqlDeleteEntry);
 
             statement.setInt(1, entry.getId());
 
@@ -202,7 +203,7 @@ public class Connector {
         }
     }
 
-
+    // Queries the database for all the ros in the Employees-table and returns them as an ObservableList
     public static ObservableList<String> getEmployees() {
         PreparedStatement statement = null;
 
@@ -233,6 +234,7 @@ public class Connector {
         return obsList;
     }
 
+    // Inserts a new Employee into the database
     public static void insertEmployee(String employee) {
 
         PreparedStatement statement = null;
@@ -246,6 +248,26 @@ public class Connector {
 
             statement.executeUpdate();
             connection.commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void deleteEmployee(String employee) {
+
+        PreparedStatement statement = null;
+
+        try (Connection connection = getConnection()){
+
+            connection.setAutoCommit(false);
+            statement = connection.prepareStatement(sqlDeleteEmployee);
+
+            statement.setString(1, employee);
+
+            statement.executeUpdate();
+            connection.commit();
+            System.out.println("Row deleted");
 
         } catch (SQLException e) {
             e.printStackTrace();

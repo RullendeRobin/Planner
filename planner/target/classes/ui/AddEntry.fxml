@@ -15,7 +15,7 @@
             <JFXComboBox fx:id="group" layoutX="29.0" layoutY="38.0" prefHeight="26.0" prefWidth="130.0" promptText="Group" unFocusColor="#3f98cf" />
             <JFXDatePicker fx:id="plannedEnd" layoutX="29.0" layoutY="190.0" prefWidth="155.0" promptText="Planned end date" />
             <JFXDatePicker fx:id="start" layoutX="29.0" layoutY="149.0" prefWidth="155.0" promptText="Start date" />
-            <JFXButton fx:id="addBtn" layoutX="192.0" layoutY="238.0" text="Add entry" />
+            <JFXButton fx:id="addBtn" defaultButton="true" layoutX="192.0" layoutY="238.0" text="Add entry" />
             <JFXTextArea fx:id="activity" layoutX="214.0" layoutY="32.0" prefHeight="186.0" prefWidth="210.0" promptText="Describe activity..." style="-fx-background-color: white;" unFocusColor="#3f98cf" />
             <JFXToggleButton fx:id="mandatory" layoutX="14.0" layoutY="106.0" maxHeight="40.0" minHeight="40.0" prefHeight="31.0" prefWidth="130.0" text="Mandatory" toggleColor="#71b5ff" toggleLineColor="#7dbeff" />
             <JFXComboBox fx:id="responsible" layoutX="29.0" layoutY="74.0" prefHeight="26.0" prefWidth="130.0" promptText="Responsible" unFocusColor="#3f98cf" />

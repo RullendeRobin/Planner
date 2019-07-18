@@ -35,6 +35,23 @@
     -fx-text-fill: -fx-primary;
 }
 
+.toggle-button {
+    -fx-text-fill: white;
+    -fx-background-color: -fx-primary;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+    -fx-font-size: 11pt;
+}
+
+
+.toggle-button:hover, .toggle-button:selected {
+    -fx-border-color: -fx-secondary;
+    -fx-background-color: -fx-secondary;
+    -fx-text-fill: -fx-primary;
+}
+
+
+
 .text-field
 {
     /*-fx-text-fill: -fx-primarytext;*/

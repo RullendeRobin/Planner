@@ -13,6 +13,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -23,6 +24,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -33,6 +35,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.ResourceBundle;
 
 public class OverviewController extends Application implements Initializable {
@@ -41,15 +44,17 @@ public class OverviewController extends Application implements Initializable {
     private JFXTreeTableView<DataEntry> table;
     private ObservableList<DataEntry> data;
     private TreeItem<DataEntry> root;
-
-    private SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-    private ContextMenu contextMenu;
-    private Tooltip tp;
     private TreeTableCell<DataEntry, Object> currentCell;
 
-    private JFXTreeTableColumn<DataEntry, Date> plannedEnd;
+    private ContextMenu contextMenu;
+    private Tooltip tp;
+
     private ObservableList<String> groupComboList;
+    private ObservableList<String> mandatoryComboList;
     private ObservableList<String> responsibleComboList;
+
+    private Properties properties;
+    private String summaryDays;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -70,7 +75,7 @@ public class OverviewController extends Application implements Initializable {
     // Methods used by the buttons in PlannerOverview.fxml to filter the data
     @FXML
     private void handleSummary() {
-        filterChanged("10", true);
+        filterChanged(summaryDays, true);
         sortColumn(4, true);
     }
 
@@ -125,6 +130,11 @@ public class OverviewController extends Application implements Initializable {
     }
 
     @FXML
+    private void handleAll() {
+        filterChanged("", false);
+    }
+
+    @FXML
     private void handleOnKeyPressed(KeyEvent event) {
 
         DataEntry de2 = new DataEntry("Finance", "Gather investors", "No", new Date(), new Date(), null, "Ola Nordmann", "Incomplete");
@@ -169,8 +179,6 @@ public class OverviewController extends Application implements Initializable {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("About.fxml"));
             Parent root1 = (Parent) fxmlLoader.load();
 
-            AddEntryController controller = fxmlLoader.getController();
-
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("About");
@@ -194,6 +202,30 @@ public class OverviewController extends Application implements Initializable {
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("Manage employees");
+            stage.setScene(new Scene(root1));
+            stage.setResizable(false);
+            stage.getIcons().addAll(
+                    new Image(getClass().getResourceAsStream("zephyr_logo16x16.png")),
+                    new Image(getClass().getResourceAsStream("zephyr_logo32x32.png")),
+                    new Image(getClass().getResourceAsStream("zephyr_logo64x64.png")));
+            stage.show();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void showSettings() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Settings.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+
+            Stage stage = new Stage();
+            SettingsController controller = fxmlLoader.getController();
+            controller.setDaysField(summaryDays);
+            controller.setProperties(properties);
+            controller.setController(this);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Settings");
             stage.setScene(new Scene(root1));
             stage.setResizable(false);
             stage.getIcons().addAll(
@@ -250,7 +282,7 @@ public class OverviewController extends Application implements Initializable {
     }
 
     private boolean daysUntilMatch(DataEntry value, String days) {
-        Date date = Date.from(LocalDate.now().plusDays(Integer.parseInt(days)).atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Date date = Date.from(LocalDate.now().plusDays(1 + Integer.parseInt(days)).atStartOfDay(ZoneId.systemDefault()).toInstant());
         return value.getPlannedEnd().before(date) && value.getEnd() == null;
     }
 
@@ -262,12 +294,17 @@ public class OverviewController extends Application implements Initializable {
 
         new Connector();
 
+        properties = new Properties();
+        properties.loadProperties();
+
+        summaryDays = properties.getConfigProps().getProperty("summaryDays");
+
         // Create all columns
         JFXTreeTableColumn<DataEntry, String> group = new JFXTreeTableColumn<>("Group");
         JFXTreeTableColumn<DataEntry, String> activity = new JFXTreeTableColumn<>("Activity");
         JFXTreeTableColumn<DataEntry, String> mandatory = new JFXTreeTableColumn<>("Mandatory");
         JFXTreeTableColumn<DataEntry, Date> start = new JFXTreeTableColumn<>("Planned Start");
-        plannedEnd = new JFXTreeTableColumn<>("   Planned \nCompletion");
+        JFXTreeTableColumn<DataEntry, Date> plannedEnd = new JFXTreeTableColumn<>("   Planned \nCompletion");
         JFXTreeTableColumn<DataEntry, Date> end = new JFXTreeTableColumn<>("Completion");
         JFXTreeTableColumn<DataEntry, String> responsible = new JFXTreeTableColumn<>("Responsible");
         JFXTreeTableColumn<DataEntry, String> status = new JFXTreeTableColumn<>("Status");
@@ -317,20 +354,20 @@ public class OverviewController extends Application implements Initializable {
         // Cell factory for the group-column, with a custom combobox-cell
         Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>> groupCellFactory =
                 jfxTreeTableColumn -> {
-                    CustomComboBoxCell cell = new CustomComboBoxCell(groupComboList);
+                    CustomComboBoxCell cell = new CustomComboBoxCell(this, 0);
                     cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
                     return cell;
                 };
 
         // List with options for the mandatory-combobox
-        ObservableList<String> mandatoryComboList = FXCollections.observableArrayList();
+        mandatoryComboList = FXCollections.observableArrayList();
         mandatoryComboList.add("Yes");
         mandatoryComboList.add("No");
 
         // Cell factory for the mandatory-column, with a custom combobox-cell
         Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>> mandatoryCellFactory =
                 jfxTreeTableColumn -> {
-                    CustomComboBoxCell cell = new CustomComboBoxCell(mandatoryComboList);
+                    CustomComboBoxCell cell = new CustomComboBoxCell(this, 1);
                     cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
                     return cell;
                 };
@@ -346,7 +383,7 @@ public class OverviewController extends Application implements Initializable {
 
         Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>> responsibleCellFactory =
                 jfxTreeTableColumn -> {
-                    CustomComboBoxCell cell = new CustomComboBoxCell(responsibleComboList);
+                    CustomComboBoxCell cell = new CustomComboBoxCell(this, 2);
                     cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
                     return cell;
                 };
@@ -500,6 +537,21 @@ public class OverviewController extends Application implements Initializable {
         System.exit(0);
     }
 
+    public ObservableList<String> getResponsibleComboList() {
+        return responsibleComboList;
+    }
+
+    public ObservableList<String> getGroupComboList() {
+        return groupComboList;
+    }
+
+    public ObservableList<String> getMandatoryComboList() {
+        return mandatoryComboList;
+    }
+
+    public void setSummaryDays(String summaryDays) {
+        this.summaryDays = summaryDays;
+    }
 
     class MyEventHandler implements EventHandler<MouseEvent> {
 

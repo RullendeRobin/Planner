@@ -3,13 +3,14 @@ package core;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.cells.editors.base.JFXTreeTableCell;
 import javafx.beans.value.ChangeListener;
-import javafx.collections.ObservableList;
 import javafx.scene.control.ComboBox;
 import javafx.scene.input.KeyCode;
+import ui.OverviewController;
 
 public class CustomComboBoxCell extends JFXTreeTableCell<DataEntry, String> {
-    public ComboBox<String> comboBox;
-    private ObservableList<String> obsList;
+    private ComboBox<String> comboBox;
+    private OverviewController controller;
+    private int index;
     private ChangeListener<? super Boolean> changeListener = (obs, ov, nv) -> {
         if (!nv) {
             commitEdit(comboBox.getValue());
@@ -17,9 +18,9 @@ public class CustomComboBoxCell extends JFXTreeTableCell<DataEntry, String> {
     };
 
 
-
-    public CustomComboBoxCell(ObservableList<String> obsList) {
-        this.obsList = obsList;
+    public CustomComboBoxCell(OverviewController controller, int index) {
+        this.controller = controller;
+        this.index = index;
     }
 
     @Override
@@ -67,8 +68,21 @@ public class CustomComboBoxCell extends JFXTreeTableCell<DataEntry, String> {
         }
     }
 
+    // Creates a combobox with the appropriate properties, the switch is used to determine which observable list to use
     private void createComboBox() {
-        comboBox = new JFXComboBox<>(obsList);
+        switch (index){
+            case 0:
+                comboBox = new JFXComboBox<>(controller.getGroupComboList());
+                break;
+            case 1:
+                comboBox = new JFXComboBox<>(controller.getMandatoryComboList());
+                break;
+            case 2:
+                comboBox = new JFXComboBox<>(controller.getResponsibleComboList());
+                break;
+            default:
+                comboBox = new JFXComboBox<>();
+        }
         comboBox.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
         comboBox.focusedProperty().addListener(changeListener);
         comboBox.setOnAction(evt -> commitEdit(comboBox.getValue()));
