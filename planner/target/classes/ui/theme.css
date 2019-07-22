@@ -35,7 +35,8 @@
     -fx-text-fill: -fx-primary;
 }
 
-.toggle-button {
+
+.menu-toggle.toggle-button {
     -fx-text-fill: white;
     -fx-background-color: -fx-primary;
     -fx-border-radius: 0;
@@ -44,13 +45,11 @@
 }
 
 
-.toggle-button:hover, .toggle-button:selected {
+.menu-toggle.toggle-button:hover, .menu-toggle.toggle-button:selected {
     -fx-border-color: -fx-secondary;
     -fx-background-color: -fx-secondary;
     -fx-text-fill: -fx-primary;
 }
-
-
 
 .text-field
 {
@@ -369,5 +368,5 @@
 }
 
 .tree-table-view .column-header {
-    -fx-label-padding: 40pt;
+    /*-fx-label-padding: 40pt;*/
 }

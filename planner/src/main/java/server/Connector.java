@@ -8,6 +8,9 @@ import javafx.collections.ObservableList;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.TemporalUnit;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,9 +19,10 @@ public class Connector {
 
     // SQL queries
     private static final String sqlSelectActivities = "SELECT * FROM Activities";
-    private static final String sqlInsert = "INSERT INTO Activities (GroupName, Activity, Mandatory, PlannedStart, PlannedEnd, Completion, Responsible, CurrStatus) "
-            + "VALUES (?,?,?,?,?,?,?,?)";
+    private static final String sqlInsert = "INSERT INTO Activities (GroupName, Activity, Mandatory, PlannedStart, PlannedEnd, Completion, Responsible, CurrStatus, RepeatID, Repeat) "
+            + "VALUES (?,?,?,?,?,?,?,?,?,?)";
     private static final String sqlDeleteEntry = "DELETE FROM Activities WHERE ID = ?";
+    private static final String sqlDeleteRepeat = "DELETE FROM Activities WHERE RepeatID = ?";
     public static final String groupUpdate = "UPDATE Activities SET GroupName = ? WHERE ID = ?";
     public static final String activityUpdate = "UPDATE Activities SET Activity = ? WHERE ID = ?";
     public static final String mandatoryUpdate = "UPDATE Activities SET Mandatory = ? WHERE ID = ?";
@@ -27,6 +31,7 @@ public class Connector {
     public static final String responsibleUpdate = "UPDATE Activities SET Responsible = ? WHERE ID = ?";
     public static final String statusUpdate = "UPDATE Activities SET CurrStatus = ? WHERE ID = ?";
     public static final String plannedEndUpdate = "UPDATE Activities SET PlannedEnd = ? WHERE ID = ?";
+    public static final String repeatUpdate = "UPDATE Activities SET Repeat = ? WHERE ID = ?";
 
     private static final String sqlSelectEmployees = "SELECT * FROM Employees";
     private static final String sqlInsertEmployee = "INSERT INTO Employees (FullName) "
@@ -94,7 +99,7 @@ public class Connector {
                     Date d2 = convertToUtilDate(rs.getDate(6));
                     Date d3 = convertToUtilDate(rs.getDate(7));
 
-                    entry = new DataEntry(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), d1, d2, d3, rs.getString(8), rs.getString(9));
+                    entry = new DataEntry(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), d1, d2, d3, rs.getString(8), rs.getString(9), rs.getInt(10), rs.getString(11));
                     obsList.add(entry);
                 }
 
@@ -125,6 +130,8 @@ public class Connector {
             statement.setDate(6, convertToSQLDate(entry.getEnd()));
             statement.setString(7, entry.getResponsible());
             statement.setString(8, entry.getStatus());
+            statement.setObject(9, null);
+            statement.setString(10, "No");
 
             statement.executeUpdate();
             connection.commit();
@@ -274,6 +281,56 @@ public class Connector {
         }
     }
 
+    public static void insertBatchData(DataEntry entry, int timeframe, TemporalUnit unit, int repetitions) {
+
+        PreparedStatement statement = null;
+
+        try (Connection connection = getConnection()){
+
+            connection.setAutoCommit(false);
+            statement = connection.prepareStatement(sqlInsert);
+
+            for (int i = 1; i <= repetitions; i++) {
+                statement.setString(1, entry.getGroup());
+                statement.setString(2, entry.getActivity());
+                statement.setString(3, entry.getMandatory());
+                statement.setDate(4, convertToSQLDate(addToDate(entry.getStart(), i*timeframe, unit)));
+                statement.setDate(5, convertToSQLDate(addToDate(entry.getPlannedEnd(), i*timeframe, unit)));
+                statement.setDate(6, convertToSQLDate(addToDate(entry.getEnd(), i*timeframe, unit)));
+                statement.setString(7, entry.getResponsible());
+                statement.setString(8, entry.getStatus());
+                statement.setInt(9, entry.getId());
+                statement.setString(10, "REPEAT");
+                statement.addBatch();
+            }
+
+            statement.executeBatch();
+            connection.commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void deleteRepeat(DataEntry entry) {
+
+        PreparedStatement statement = null;
+
+        try (Connection connection = getConnection()){
+
+            connection.setAutoCommit(false);
+            statement = connection.prepareStatement(sqlDeleteRepeat);
+
+            statement.setInt(1, entry.getId());
+
+            statement.executeUpdate();
+            connection.commit();
+            System.out.println("Repeats deleted");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
     // Return null if the date is null, otherwise return a java.util.Date
     private static Date convertToUtilDate(java.sql.Date date) {
         return (date == null) ? null : new Date(date.getTime());
@@ -282,6 +339,15 @@ public class Connector {
     // Return null if the date is null, otherwise return a java.sql.Date
     private static java.sql.Date convertToSQLDate(Date date) {
         return (date == null) ? null : new java.sql.Date(date.getTime());
+    }
+
+    private static Date addToDate(Date date, int timeframe, TemporalUnit unit) {
+
+        if (date == null) {
+            return null;
+        }
+        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().plus(timeframe, unit);
+        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     // Getter and setter for autoUpdate boolean

@@ -13,7 +13,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -24,26 +23,25 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import server.Connector;
 
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.ResourceBundle;
 
 public class OverviewController extends Application implements Initializable {
 
     @FXML
     private JFXTreeTableView<DataEntry> table;
-    private ObservableList<DataEntry> data;
-    private TreeItem<DataEntry> root;
+
+    @FXML
+    private TextField textField;
+
     private TreeTableCell<DataEntry, Object> currentCell;
 
     private ContextMenu contextMenu;
@@ -135,17 +133,12 @@ public class OverviewController extends Application implements Initializable {
     }
 
     @FXML
-    private TextField textField;
-
-    @FXML
     private void handleOnKeyPressed(KeyEvent event) {
 
-        DataEntry de2 = new DataEntry("Finance", "Gather investors", "No", new Date(), new Date(), null, "Ola Nordmann", "Incomplete");
-
         if (event.getCode().equals(KeyCode.A)) {
-            table.setPredicate(entry -> entry.getValue().getGroup().contains("Finance"));
+            table.refresh();
         } else if (event.getCode().equals(KeyCode.S)) {
-            table.setPredicate(null);
+
         } else if (event.getCode().equals(KeyCode.ESCAPE)) {
             Platform.exit();
             System.exit(0);
@@ -240,6 +233,29 @@ public class OverviewController extends Application implements Initializable {
         }
     }
 
+    public void showRepeat() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Repeat.fxml"));
+            Parent root1 = (Parent) fxmlLoader.load();
+
+            RepeatController controller = fxmlLoader.getController();
+            controller.setEntry(table.getSelectionModel().getSelectedItem().getValue());
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Repeat entry");
+            stage.setScene(new Scene(root1));
+            stage.setResizable(false);
+            stage.getIcons().addAll(
+                    new Image(getClass().getResourceAsStream("zephyr_logo16x16.png")),
+                    new Image(getClass().getResourceAsStream("zephyr_logo32x32.png")),
+                    new Image(getClass().getResourceAsStream("zephyr_logo64x64.png")));
+            stage.show();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void sortColumn(int column, boolean ascending) {
 
         TreeTableColumn<DataEntry, ?> col = table.getColumns().get(column);
@@ -280,9 +296,7 @@ public class OverviewController extends Application implements Initializable {
 
         summaryDays = properties.getConfigProps().getProperty("summaryDays");
 
-        textField.textProperty().addListener((o,oldVal,newVal)->{
-            filterOnAll(newVal);
-        });
+        textField.textProperty().addListener((o,oldVal,newVal)-> filterOnAll(newVal));
 
 
         // Create all columns
@@ -295,6 +309,7 @@ public class OverviewController extends Application implements Initializable {
         JFXTreeTableColumn<DataEntry, String> responsible = new JFXTreeTableColumn<>("Responsible");
         JFXTreeTableColumn<DataEntry, String> status = new JFXTreeTableColumn<>("Status");
         JFXTreeTableColumn<DataEntry, Double> progress = new JFXTreeTableColumn<>("Progress");
+        JFXTreeTableColumn<DataEntry, String> repeat = new JFXTreeTableColumn<>("Repeated");
 
         // Binding together the cells value with the corresponding value in a DateEntry
         group.setCellValueFactory(param -> param.getValue().getValue().groupProperty());
@@ -306,18 +321,19 @@ public class OverviewController extends Application implements Initializable {
         responsible.setCellValueFactory(param -> param.getValue().getValue().responsibleProperty());
         status.setCellValueFactory(param -> param.getValue().getValue().statusProperty());
         progress.setCellValueFactory(param -> param.getValue().getValue().progressProperty().asObject());
+        repeat.setCellValueFactory(param -> param.getValue().getValue().repeatProperty());
 
 
         // Setting data, root and all table-columns
-        data = FXCollections.observableArrayList();
-        root = new RecursiveTreeItem<>(data, RecursiveTreeObject::getChildren);
+        ObservableList<DataEntry> data = FXCollections.observableArrayList();
+        TreeItem<DataEntry> root = new RecursiveTreeItem<>(data, RecursiveTreeObject::getChildren);
 
-        table.getColumns().setAll(group, activity, mandatory, start, plannedEnd, end, responsible, /*progress,*/ status);
+        table.getColumns().setAll(group, activity, mandatory, repeat, start, plannedEnd, end, responsible, /*progress,*/ status);
         table.setEditable(true);
         table.setRoot(root);
         table.setShowRoot(false);
 
-        // Giving each columns a unique identifier
+        // Giving each columns a unique identifier and setting preferred width
         int i = 0;
         for (TreeTableColumn col : table.getColumns()) {
             col.setId(Integer.toString(i));
@@ -325,6 +341,13 @@ public class OverviewController extends Application implements Initializable {
 
             i++;
         }
+        mandatory.setMinWidth(75);
+        mandatory.setPrefWidth(100);
+        mandatory.setMaxWidth(200);
+
+        repeat.setMinWidth(75);
+        repeat.setPrefWidth(100);
+        repeat.setMaxWidth(200);
 
         // List with options for the group-combobox
         groupComboList = FXCollections.observableArrayList();
@@ -457,6 +480,7 @@ public class OverviewController extends Application implements Initializable {
         responsible.setOnEditCommit(evt -> Connector.updateData(evt.getNewValue(), table.getSelectionModel().getSelectedItem().getValue(), Connector.responsibleUpdate));
         status.setOnEditCommit(evt -> Connector.updateData(evt.getNewValue(), table.getSelectionModel().getSelectedItem().getValue(), Connector.statusUpdate));
 
+        // Gets the newest list of employees from the database each time onEditStart() is called
         responsible.setOnEditStart(evt -> responsibleComboList = Connector.getEmployees());
 
 
@@ -487,13 +511,19 @@ public class OverviewController extends Application implements Initializable {
         MenuItem item3 = new MenuItem("New entry");
         item3.setOnAction(event -> showAddEntry());
 
+        MenuItem item4 = new MenuItem("Repeat entry");
+        item4.setOnAction(event -> showRepeat());
+
+        MenuItem item5 = new MenuItem("Delete repeats");
+        item5.setOnAction(event -> deleteRepeat());
+
         MenuItem separator = new SeparatorMenuItem();
-        contextMenu.getItems().addAll(item3, item1, separator, item2);
+        contextMenu.getItems().addAll(item3, item4, item1, item5, separator, item2);
     }
 
     // Gets the correct coordinates of the mouse and displays the contextmenu
     public void showContextMenu(MouseEvent event) {
-        if (event.getButton() == MouseButton.SECONDARY ) {
+        if (event.getButton() == MouseButton.SECONDARY) {
             contextMenu.show(table, table.localToScreen(table.getBoundsInLocal()).getMinX()+ event.getX(),
                     table.localToScreen(table.getBoundsInLocal()).getMinY() + event.getY());
         }
@@ -502,6 +532,16 @@ public class OverviewController extends Application implements Initializable {
     public void deleteRow() {
         try {
             Connector.deleteData(table.getSelectionModel().getSelectedItem().getValue());
+        } catch (NullPointerException e) {
+            System.out.println("No row selected");
+        }
+    }
+
+    public void deleteRepeat() {
+        try {
+            DataEntry entry = table.getSelectionModel().getSelectedItem().getValue();
+            Connector.updateData("No", entry, Connector.repeatUpdate);
+            Connector.deleteRepeat(entry);
         } catch (NullPointerException e) {
             System.out.println("No row selected");
         }
@@ -552,19 +592,25 @@ public class OverviewController extends Application implements Initializable {
                     currentCell = (TreeTableCell) t.getSource();
                     String id = currentCell.getTableColumn().getId();
                     if (currentCell.getText() == null || id.equals("0") || id.equals("2") || id.equals("7")) {
-                        contextMenu.getItems().get(1).setDisable(true);
+                        contextMenu.getItems().get(2).setDisable(true);
                         currentCell.getTreeTableRow().getTreeItem().getValue();
                     } else {
-                        contextMenu.getItems().get(1).setDisable(false);
+                        contextMenu.getItems().get(2).setDisable(false);
                     }
-                    contextMenu.getItems().get(3).setDisable(false);
+                    contextMenu.getItems().get(5).setDisable(false);
+                    if (table.getSelectionModel().getSelectedItem().getValue().getRepeat().equals("Yes")) {
+                        contextMenu.getItems().get(3).setDisable(false);
+                    } else {
+                        contextMenu.getItems().get(3).setDisable(true);
+                    }
 
                 } catch (NullPointerException e) {
                     System.out.println("Nullpointer");
-                    contextMenu.getItems().get(1).setDisable(true);
-                    contextMenu.getItems().get(3).setDisable(true);
+                    contextMenu.getItems().get(2).setDisable(true);
+                    contextMenu.getItems().get(5).setDisable(true);
                 }
             } else {
+                currentCell = null;
                 contextMenu.hide();
 
             }

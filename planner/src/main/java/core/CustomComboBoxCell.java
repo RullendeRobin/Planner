@@ -92,7 +92,7 @@ public class CustomComboBoxCell extends JFXTreeTableCell<DataEntry, String> {
                 comboBox.focusedProperty().removeListener(changeListener);
                 cancelEdit();
             }
-            if (ke.getCode().equals(KeyCode.TAB)) {
+            if (ke.getCode().equals(KeyCode.ENTER)) {
                 commitEdit(comboBox.getValue());
             }
         });

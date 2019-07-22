@@ -44,22 +44,22 @@
          <bottom>
             <HBox fx:id="hbox" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" prefWidth="200.0" style="-fx-background-color: #71b5ff;" BorderPane.alignment="CENTER">
                <children>
-                  <ToggleButton mnemonicParsing="false" onAction="#handleSummary" text="Summary">
+                  <ToggleButton mnemonicParsing="false" onAction="#handleSummary" styleClass="menu-toggle" text="Summary">
                      <toggleGroup>
                         <ToggleGroup fx:id="filterGroup" />
                      </toggleGroup>
                   </ToggleButton>
-                  <ToggleButton layoutX="810.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleFinance" text="Finance" toggleGroup="$filterGroup" />
-                  <ToggleButton layoutX="849.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleAssets" text="Assets" toggleGroup="$filterGroup" />
-                  <ToggleButton layoutX="888.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleHSE" text="HSE" toggleGroup="$filterGroup" />
-                  <ToggleButton layoutX="928.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleStakeholders" text="Stakeholders" toggleGroup="$filterGroup" />
-                  <ToggleButton layoutX="967.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleAuthorities" text="Authorities" toggleGroup="$filterGroup" />
-                  <ToggleButton layoutX="992.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleGrid" text="Grid" toggleGroup="$filterGroup" />
-                  <ToggleButton layoutX="994.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleCivil" text="Civil" toggleGroup="$filterGroup" />
-                  <ToggleButton layoutX="996.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleInsurance" text="Insurance" toggleGroup="$filterGroup" />
-                  <ToggleButton layoutX="559.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleAccounting" text="Accounting" toggleGroup="$filterGroup" />
-                  <ToggleButton layoutX="998.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleRevision" text="Revision" toggleGroup="$filterGroup" />
-                  <ToggleButton layoutX="999.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleAll" selected="true" text="All" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="810.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleFinance" styleClass="menu-toggle" text="Finance" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="849.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleAssets" styleClass="menu-toggle" text="Assets" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="888.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleHSE" styleClass="menu-toggle" text="HSE" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="928.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleStakeholders" styleClass="menu-toggle" text="Stakeholders" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="967.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleAuthorities" styleClass="menu-toggle" text="Authorities" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="992.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleGrid" styleClass="menu-toggle" text="Grid" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="994.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleCivil" styleClass="menu-toggle" text="Civil" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="996.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleInsurance" styleClass="menu-toggle" text="Insurance" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="559.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleAccounting" styleClass="menu-toggle" text="Accounting" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="998.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleRevision" styleClass="menu-toggle" text="Revision" toggleGroup="$filterGroup" />
+                  <ToggleButton layoutX="999.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleAll" selected="true" styleClass="menu-toggle" text="All" toggleGroup="$filterGroup" />
                   <StackPane alignment="CENTER_LEFT" prefHeight="150.0" prefWidth="150.0" HBox.hgrow="ALWAYS">
                      <children>
                         <TextField fx:id="textField" maxWidth="200.0" prefWidth="150.0" promptText="Search..." StackPane.alignment="CENTER_RIGHT">

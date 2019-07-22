@@ -22,6 +22,8 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
     private StringProperty responsible;
     private StringProperty status;
     private DoubleProperty progress;
+    private IntegerProperty repeatId;
+    private StringProperty repeat;
 
     public DataEntry(String group, String activity, String mandatory, Date start, Date plannedEnd, Date end, String responsible, String status) {
         this.id = new SimpleIntegerProperty(0);
@@ -36,7 +38,7 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
         this.progress = new SimpleDoubleProperty(calculateProgress(start, plannedEnd));
     }
 
-    public DataEntry(int id, String group, String activity, String mandatory, Date start, Date plannedEnd, Date end, String responsible, String status) {
+    public DataEntry(int id, String group, String activity, String mandatory, Date start, Date plannedEnd, Date end, String responsible, String status, int repeatId, String repeat) {
         this.id = new SimpleIntegerProperty(id);
         this.group = new SimpleStringProperty(group);
         this.activity = new SimpleStringProperty(activity);
@@ -47,6 +49,8 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
         this.responsible = new SimpleStringProperty(responsible);
         this.status = new SimpleStringProperty(status);
         this.progress = new SimpleDoubleProperty(calculateProgress(start, plannedEnd));
+        this.repeatId = new SimpleIntegerProperty(repeatId);
+        this.repeat = new SimpleStringProperty(repeat);
     }
 
     //Below are all the getters and setters for the properties
@@ -170,6 +174,31 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
         this.progress.set(l);
     }
 
+    public int getRepeatId() {
+        return repeatId.get();
+    }
+
+    public IntegerProperty repeatIdProperty() {
+        return repeatId;
+    }
+
+    public void setRepeatId(int repeatId) {
+        this.repeatId.set(repeatId);
+    }
+
+    public String getRepeat() {
+        return repeat.get();
+    }
+
+    public StringProperty repeatProperty() {
+        return repeat;
+    }
+
+    public void setRepeat(String repeat) {
+        this.repeat.set(repeat);
+    }
+
+
     @Override
     public String toString() {
         return getGroup() + " " + getActivity() + " " + getMandatory() + " " + formatDate(getStart()) + " "
@@ -222,6 +251,7 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
         }
         return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM));
     }
+
 
 }
 

@@ -74,6 +74,7 @@ public class CustomDateCell extends JFXTreeTableCell<DataEntry, Date> {
                 commitEdit(Date.from(datePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
             }
         });
+
     }
     protected LocalDate getDate() {
         return getItem() == null ?  LocalDate.now() : getItem().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
