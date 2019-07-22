@@ -22,6 +22,7 @@ public class AddEmployeeController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
         addBtn.setOnAction(event -> {
             if (!textField.getText().equals("")) {
                 Connector.insertEmployee(textField.getText());

@@ -3,6 +3,9 @@ package core;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import javafx.beans.property.*;
 
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Date;
 import java.util.Objects;
 
@@ -169,8 +172,8 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
 
     @Override
     public String toString() {
-        return getGroup() + " " + getActivity() + " " + getMandatory() + " " + getStart() + " "
-                + getPlannedEnd() + " " + getEnd() + " " + getResponsible() + " " + getStatus();
+        return getGroup() + " " + getActivity() + " " + getMandatory() + " " + formatDate(getStart()) + " "
+                + formatDate(getPlannedEnd()) + " " + formatDate(getEnd()) + " " + getResponsible() + " " + getStatus();
     }
 
     @Override
@@ -213,6 +216,12 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
         }
     }
 
+    private String formatDate(Date date) {
+        if (date == null) {
+            return "";
+        }
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM));
+    }
 
 }
 

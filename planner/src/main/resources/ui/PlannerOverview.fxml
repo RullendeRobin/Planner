@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXTreeTableView?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.TreeTableView?>
@@ -58,6 +60,18 @@
                   <ToggleButton layoutX="559.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleAccounting" text="Accounting" toggleGroup="$filterGroup" />
                   <ToggleButton layoutX="998.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleRevision" text="Revision" toggleGroup="$filterGroup" />
                   <ToggleButton layoutX="999.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleAll" selected="true" text="All" toggleGroup="$filterGroup" />
+                  <StackPane alignment="CENTER_LEFT" prefHeight="150.0" prefWidth="150.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <TextField fx:id="textField" maxWidth="200.0" prefWidth="150.0" promptText="Search..." StackPane.alignment="CENTER_RIGHT">
+                           <StackPane.margin>
+                              <Insets left="40.0" />
+                           </StackPane.margin>
+                        </TextField>
+                     </children>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </StackPane>
                </children>
             </HBox>
          </bottom>

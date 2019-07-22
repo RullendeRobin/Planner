@@ -75,64 +75,67 @@ public class OverviewController extends Application implements Initializable {
     // Methods used by the buttons in PlannerOverview.fxml to filter the data
     @FXML
     private void handleSummary() {
-        filterChanged(summaryDays, true);
+        filterOnDaysUntilCompletion(summaryDays);
         sortColumn(4, true);
     }
 
     @FXML
     private void handleFinance() {
-        filterChanged("Finance", false);
+        filterOnGroup("Finance");
     }
 
     @FXML
     private void handleAssets() {
-        filterChanged("Assets", false);
+        filterOnGroup("Assets");
     }
 
     @FXML
     private void handleHSE() {
-        filterChanged("HSE", false);
+        filterOnGroup("HSE");
     }
 
     @FXML
     private void handleStakeholders() {
-        filterChanged("Stakeholders", false);
+        filterOnGroup("Stakeholders");
     }
 
     @FXML
     private void handleAuthorities() {
-        filterChanged("Authorities", false);
+        filterOnGroup("Authorities");
     }
 
     @FXML
     private void handleGrid() {
-        filterChanged("Grid", false);
+        filterOnGroup("Grid");
     }
 
     @FXML
     private void handleCivil() {
-        filterChanged("Civil", false);
+        filterOnGroup("Civil");
     }
 
     @FXML
     private void handleInsurance() {
-        filterChanged("Insurance", false);
+        filterOnGroup("Insurance");
     }
 
     @FXML
     private void handleAccounting() {
-        filterChanged("Accounting", false);
+        filterOnGroup("Accounting");
     }
 
     @FXML
     private void handleRevision() {
-        filterChanged("Revision", false);
+        filterOnGroup("Revision");
     }
 
     @FXML
     private void handleAll() {
-        filterChanged("", false);
+        filterOnGroup("");
     }
+
+    @FXML
+    private TextField textField;
 
     @FXML
     private void handleOnKeyPressed(KeyEvent event) {
@@ -140,10 +143,9 @@ public class OverviewController extends Application implements Initializable {
         DataEntry de2 = new DataEntry("Finance", "Gather investors", "No", new Date(), new Date(), null, "Ola Nordmann", "Incomplete");
 
         if (event.getCode().equals(KeyCode.A)) {
-            filterChanged("", false);
+            table.setPredicate(entry -> entry.getValue().getGroup().contains("Finance"));
         } else if (event.getCode().equals(KeyCode.S)) {
-            Connector.insertData(de2);
-            System.out.println("Uploaded data");
+            table.setPredicate(null);
         } else if (event.getCode().equals(KeyCode.ESCAPE)) {
             Platform.exit();
             System.exit(0);
@@ -241,49 +243,28 @@ public class OverviewController extends Application implements Initializable {
     private void sortColumn(int column, boolean ascending) {
 
         TreeTableColumn<DataEntry, ?> col = table.getColumns().get(column);
-        col.setSortType(TreeTableColumn.SortType.ASCENDING);
+        if (ascending) {
+            col.setSortType(TreeTableColumn.SortType.ASCENDING);
+        } else {
+            col.setSortType(TreeTableColumn.SortType.DESCENDING);
+        }
         table.getSortOrder().clear();
         table.getSortOrder().add(col);
         table.sort();
     }
 
-    private void filterChanged(String filter, boolean filterDates) {
-        if (filter.isEmpty()) {
-            table.setRoot(root);
-        }
-        else {
-            TreeItem<DataEntry> filteredRoot = new TreeItem<>();
-            filter(root, filter, filteredRoot, filterDates);
-            table.setRoot(filteredRoot);
-
-        }
-    }
-
-    private void filter(TreeItem<DataEntry> root, String filter, TreeItem<DataEntry> filteredRoot, boolean filterDates) {
-        for (TreeItem<DataEntry> child : root.getChildren()) {
-            TreeItem<DataEntry> filteredChild = new TreeItem<>();
-            filteredChild.setValue(child.getValue());
-            filteredChild.setExpanded(true);
-            filter(child, filter, filteredChild, filterDates);
-            if (filterDates) {
-                if (!filteredChild.getChildren().isEmpty() || daysUntilMatch(filteredChild.getValue(), filter)) {
-                    filteredRoot.getChildren().add(filteredChild);
-                }
-            } else {
-                if (!filteredChild.getChildren().isEmpty() || isMatch(filteredChild.getValue(), filter)) {
-                    filteredRoot.getChildren().add(filteredChild);
-                }
-            }
-        }
-    }
-
-    private boolean isMatch(DataEntry value, String filter) {
-        return value.getGroup().equals(filter);
-    }
-
-    private boolean daysUntilMatch(DataEntry value, String days) {
+    private void filterOnDaysUntilCompletion(String days) {
         Date date = Date.from(LocalDate.now().plusDays(1 + Integer.parseInt(days)).atStartOfDay(ZoneId.systemDefault()).toInstant());
-        return value.getPlannedEnd().before(date) && value.getEnd() == null;
+        table.setPredicate(entry -> entry.getValue().getPlannedEnd().before(date) && entry.getValue().getEnd() == null);
+    }
+
+    private void filterOnGroup(String filter) {
+        table.setPredicate(entry -> entry.getValue().getGroup().contains(filter));
+        table.getSortOrder().clear();
+    }
+
+    private void filterOnAll(String filter) {
+        table.setPredicate(entry -> entry.getValue().toString().toLowerCase().contains(filter.toLowerCase()));
     }
 
 
@@ -298,6 +279,11 @@ public class OverviewController extends Application implements Initializable {
         properties.loadProperties();
 
         summaryDays = properties.getConfigProps().getProperty("summaryDays");
+
+        textField.textProperty().addListener((o,oldVal,newVal)->{
+            filterOnAll(newVal);
+        });
+
 
         // Create all columns
         JFXTreeTableColumn<DataEntry, String> group = new JFXTreeTableColumn<>("Group");
@@ -322,6 +308,7 @@ public class OverviewController extends Application implements Initializable {
         progress.setCellValueFactory(param -> param.getValue().getValue().progressProperty().asObject());
 
 
+        // Setting data, root and all table-columns
         data = FXCollections.observableArrayList();
         root = new RecursiveTreeItem<>(data, RecursiveTreeObject::getChildren);
 
@@ -330,11 +317,12 @@ public class OverviewController extends Application implements Initializable {
         table.setRoot(root);
         table.setShowRoot(false);
 
-
+        // Giving each columns a unique identifier
         int i = 0;
         for (TreeTableColumn col : table.getColumns()) {
             col.setId(Integer.toString(i));
             col.setPrefWidth(100);
+
             i++;
         }
 
@@ -372,6 +360,7 @@ public class OverviewController extends Application implements Initializable {
                     return cell;
                 };
 
+        // Cell factory for an optional progress-column
         Callback<TreeTableColumn<DataEntry, Double>, TreeTableCell<DataEntry, Double>> progressCellFactory =
                 jfxTreeTableColumn -> {
                     ProgressBarTreeTableCell<DataEntry> cell = new ProgressBarTreeTableCell<>();
@@ -379,8 +368,8 @@ public class OverviewController extends Application implements Initializable {
                     return cell;
                 };
 
+        // Cell factory for responsible-column and fetching of employees from the database
         responsibleComboList = Connector.getEmployees();
-
         Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>> responsibleCellFactory =
                 jfxTreeTableColumn -> {
                     CustomComboBoxCell cell = new CustomComboBoxCell(this, 2);
