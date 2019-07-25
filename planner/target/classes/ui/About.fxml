@@ -16,7 +16,7 @@
       <Label layoutX="29.0" layoutY="109.0" text="Email: robinafinstad@gmail.com" />
       <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="12.0" layoutY="23.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@zephyr_logo.png" />
+            <Image url="@zephyr_full_logo225x87.png" />
          </image>
       </ImageView>
    </children>

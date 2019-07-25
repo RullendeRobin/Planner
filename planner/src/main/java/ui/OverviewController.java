@@ -4,6 +4,7 @@ import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.controls.RecursiveTreeItem;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
+import com.sun.javafx.application.LauncherImpl;
 import core.*;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -67,14 +68,15 @@ public class OverviewController extends Application implements Initializable {
     }
 
     public static void main(String[] args) {
-        Application.launch(args);
+        LauncherImpl.launchApplication(OverviewController.class, LoadingController.class, args);
+        //Application.launch(args);
     }
 
     // Methods used by the buttons in PlannerOverview.fxml to filter the data
     @FXML
     private void handleSummary() {
         filterOnDaysUntilCompletion(summaryDays);
-        sortColumn(4, true);
+        sortColumn(5, true);
     }
 
     @FXML
@@ -138,10 +140,9 @@ public class OverviewController extends Application implements Initializable {
         if (event.getCode().equals(KeyCode.A)) {
             table.refresh();
         } else if (event.getCode().equals(KeyCode.S)) {
-
+            sortColumn(5, true);
         } else if (event.getCode().equals(KeyCode.ESCAPE)) {
-            Platform.exit();
-            System.exit(0);
+
         }
     }
 
@@ -172,7 +173,7 @@ public class OverviewController extends Application implements Initializable {
     public void showAbout() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("About.fxml"));
-            Parent root1 = (Parent) fxmlLoader.load();
+            Parent root1 = fxmlLoader.load();
 
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -233,7 +234,7 @@ public class OverviewController extends Application implements Initializable {
         }
     }
 
-    public void showRepeat() {
+    private void showRepeat() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Repeat.fxml"));
             Parent root1 = (Parent) fxmlLoader.load();
@@ -257,7 +258,6 @@ public class OverviewController extends Application implements Initializable {
     }
 
     private void sortColumn(int column, boolean ascending) {
-
         TreeTableColumn<DataEntry, ?> col = table.getColumns().get(column);
         if (ascending) {
             col.setSortType(TreeTableColumn.SortType.ASCENDING);
@@ -266,12 +266,13 @@ public class OverviewController extends Application implements Initializable {
         }
         table.getSortOrder().clear();
         table.getSortOrder().add(col);
-        table.sort();
+        col.setSortable(true);
     }
 
     private void filterOnDaysUntilCompletion(String days) {
         Date date = Date.from(LocalDate.now().plusDays(1 + Integer.parseInt(days)).atStartOfDay(ZoneId.systemDefault()).toInstant());
         table.setPredicate(entry -> entry.getValue().getPlannedEnd().before(date) && entry.getValue().getEnd() == null);
+        table.getSelectionModel().clearSelection();
     }
 
     private void filterOnGroup(String filter) {
@@ -328,7 +329,7 @@ public class OverviewController extends Application implements Initializable {
         ObservableList<DataEntry> data = FXCollections.observableArrayList();
         TreeItem<DataEntry> root = new RecursiveTreeItem<>(data, RecursiveTreeObject::getChildren);
 
-        table.getColumns().setAll(group, activity, mandatory, repeat, start, plannedEnd, end, responsible, /*progress,*/ status);
+        table.getColumns().setAll(group, activity, mandatory, repeat, start, plannedEnd, end, responsible, progress, status);
         table.setEditable(true);
         table.setRoot(root);
         table.setShowRoot(false);
@@ -341,13 +342,13 @@ public class OverviewController extends Application implements Initializable {
 
             i++;
         }
+
+        // Set column width
         mandatory.setMinWidth(75);
-        mandatory.setPrefWidth(100);
-        mandatory.setMaxWidth(200);
+        mandatory.setMaxWidth(100);
 
         repeat.setMinWidth(75);
-        repeat.setPrefWidth(100);
-        repeat.setMaxWidth(200);
+        repeat.setMaxWidth(100);
 
         // List with options for the group-combobox
         groupComboList = FXCollections.observableArrayList();
@@ -386,7 +387,21 @@ public class OverviewController extends Application implements Initializable {
         // Cell factory for an optional progress-column
         Callback<TreeTableColumn<DataEntry, Double>, TreeTableCell<DataEntry, Double>> progressCellFactory =
                 jfxTreeTableColumn -> {
-                    ProgressBarTreeTableCell<DataEntry> cell = new ProgressBarTreeTableCell<>();
+                    ProgressBarTreeTableCell<DataEntry> cell = new ProgressBarTreeTableCell<>() {
+                        @Override
+                        public void updateItem(Double item, boolean empty) {
+                            super.updateItem(item, empty);
+
+                            if (!isEmpty()) {
+                                if (this.getTreeTableRow().getTreeItem().getValue().getEnd() != null) {
+                                    this.setStyle("-fx-accent: rgb(0,201,0);");
+                                } else if (item == 1){
+                                    this.setStyle("-fx-accent: rgb(231,0,0)");
+                                }
+                            }
+
+                        }
+                    };
                     cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
                     return cell;
                 };
@@ -497,7 +512,7 @@ public class OverviewController extends Application implements Initializable {
     // Creates a contextmenu and fills it with items
     private void initContextMenu() {
         contextMenu = new ContextMenu();
-        MenuItem item1 = new MenuItem("Delete content of cell");
+        MenuItem item1 = new MenuItem("Delete contents of cell");
         item1.setOnAction(event -> {
             try {
                 deleteContent(currentCell);
@@ -518,7 +533,8 @@ public class OverviewController extends Application implements Initializable {
         item5.setOnAction(event -> deleteRepeat());
 
         MenuItem separator = new SeparatorMenuItem();
-        contextMenu.getItems().addAll(item3, item4, item1, item5, separator, item2);
+        MenuItem separator2 = new SeparatorMenuItem();
+        contextMenu.getItems().addAll(item3, item4, separator2, item1, item5, separator, item2);
     }
 
     // Gets the correct coordinates of the mouse and displays the contextmenu
@@ -537,7 +553,7 @@ public class OverviewController extends Application implements Initializable {
         }
     }
 
-    public void deleteRepeat() {
+    private void deleteRepeat() {
         try {
             DataEntry entry = table.getSelectionModel().getSelectedItem().getValue();
             Connector.updateData("No", entry, Connector.repeatUpdate);
@@ -578,7 +594,7 @@ public class OverviewController extends Application implements Initializable {
         return mandatoryComboList;
     }
 
-    public void setSummaryDays(String summaryDays) {
+    protected void setSummaryDays(String summaryDays) {
         this.summaryDays = summaryDays;
     }
 
@@ -592,22 +608,22 @@ public class OverviewController extends Application implements Initializable {
                     currentCell = (TreeTableCell) t.getSource();
                     String id = currentCell.getTableColumn().getId();
                     if (currentCell.getText() == null || id.equals("0") || id.equals("2") || id.equals("7")) {
-                        contextMenu.getItems().get(2).setDisable(true);
+                        contextMenu.getItems().get(3).setDisable(true);
                         currentCell.getTreeTableRow().getTreeItem().getValue();
                     } else {
-                        contextMenu.getItems().get(2).setDisable(false);
-                    }
-                    contextMenu.getItems().get(5).setDisable(false);
-                    if (table.getSelectionModel().getSelectedItem().getValue().getRepeat().equals("Yes")) {
                         contextMenu.getItems().get(3).setDisable(false);
+                    }
+                    contextMenu.getItems().get(6).setDisable(false);
+                    if (table.getSelectionModel().getSelectedItem().getValue().getRepeat().equals("Yes")) {
+                        contextMenu.getItems().get(4).setDisable(false);
                     } else {
-                        contextMenu.getItems().get(3).setDisable(true);
+                        contextMenu.getItems().get(4).setDisable(true);
                     }
 
                 } catch (NullPointerException e) {
-                    System.out.println("Nullpointer");
-                    contextMenu.getItems().get(2).setDisable(true);
-                    contextMenu.getItems().get(5).setDisable(true);
+                    System.out.println("Null-pointer");
+                    contextMenu.getItems().get(3).setDisable(true);
+                    contextMenu.getItems().get(6).setDisable(true);
                 }
             } else {
                 currentCell = null;

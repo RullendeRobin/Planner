@@ -296,7 +296,7 @@ public class Connector {
                 statement.setString(3, entry.getMandatory());
                 statement.setDate(4, convertToSQLDate(addToDate(entry.getStart(), i*timeframe, unit)));
                 statement.setDate(5, convertToSQLDate(addToDate(entry.getPlannedEnd(), i*timeframe, unit)));
-                statement.setDate(6, convertToSQLDate(addToDate(entry.getEnd(), i*timeframe, unit)));
+                statement.setDate(6, null);
                 statement.setString(7, entry.getResponsible());
                 statement.setString(8, entry.getStatus());
                 statement.setInt(9, entry.getId());

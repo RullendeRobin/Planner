@@ -201,7 +201,7 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
 
     @Override
     public String toString() {
-        return getGroup() + " " + getActivity() + " " + getMandatory() + " " + formatDate(getStart()) + " "
+        return getGroup() + " " + getActivity() + " " + getMandatory() + " " + getRepeat() + " " + formatDate(getStart()) + " "
                 + formatDate(getPlannedEnd()) + " " + formatDate(getEnd()) + " " + getResponsible() + " " + getStatus();
     }
 
@@ -236,9 +236,9 @@ public class DataEntry extends RecursiveTreeObject<DataEntry> {
         long totalMinutes = plannedEnd.getTime() - start.getTime();
         long currentMinutes = new Date().getTime() - start.getTime();
         double percentage = totalMinutes == 0 ? 1 : (double) currentMinutes/totalMinutes;
-        if (percentage < 0) {
+        if (percentage < 0 && getEnd() == null) {
             return 0;
-        } else if (percentage > 1) {
+        } else if (percentage > 1 || getEnd() != null) {
             return 1;
         } else {
             return percentage;
