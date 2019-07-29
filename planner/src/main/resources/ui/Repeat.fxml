@@ -11,7 +11,6 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 
-
 <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="120.0" prefWidth="350.0" stylesheets="@theme.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.RepeatController">
    <children>
       <GridPane prefHeight="150.0" prefWidth="350.0">
@@ -27,10 +26,12 @@
         </rowConstraints>
          <children>
             <TextField fx:id="timeframeField" GridPane.columnIndex="1" />
+            <TextField fx:id="repetitionsField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <JFXComboBox fx:id="timeframeBox" promptText="Timeframe..." GridPane.columnIndex="2" GridPane.halignment="CENTER" />
             <HBox alignment="CENTER_RIGHT" spacing="5.0" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="CENTER">
                <children>
-                  <JFXButton fx:id="cancelBtn" text="Cancel" />
-                  <JFXButton fx:id="saveBtn" text="Save">
+                  <JFXButton fx:id="cancelBtn" cancelButton="true" text="Cancel" />
+                  <JFXButton fx:id="saveBtn" defaultButton="true" text="Save">
                      <HBox.margin>
                         <Insets right="7.0" />
                      </HBox.margin>
@@ -40,9 +41,7 @@
                   <Insets bottom="5.0" />
                </padding>
             </HBox>
-            <JFXComboBox fx:id="timeframeBox" promptText="Timeframe..." GridPane.columnIndex="2" GridPane.halignment="CENTER" />
             <Label text="Repeat this activity every: " GridPane.halignment="CENTER" />
-            <TextField fx:id="repetitionsField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <Label text="Amount of repetitions: " GridPane.halignment="CENTER" GridPane.rowIndex="1" />
          </children>
       </GridPane>

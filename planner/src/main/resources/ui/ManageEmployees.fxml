@@ -25,7 +25,7 @@
                      </HBox.margin>
                   </JFXButton>
                   <JFXButton fx:id="deleteBtn" focusTraversable="false" text="Delete" />
-                  <JFXButton fx:id="closeBtn" defaultButton="true" focusTraversable="false" text="Close">
+                  <JFXButton fx:id="closeBtn" cancelButton="true" defaultButton="true" focusTraversable="false" text="Close">
                      <HBox.margin>
                         <Insets left="205.2" />
                      </HBox.margin>

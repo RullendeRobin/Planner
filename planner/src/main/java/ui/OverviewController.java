@@ -14,6 +14,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -34,6 +35,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.ResourceBundle;
+import java.util.logging.Filter;
 
 public class OverviewController extends Application implements Initializable {
 
@@ -44,6 +46,7 @@ public class OverviewController extends Application implements Initializable {
     private TextField textField;
 
     private TreeTableCell<DataEntry, Object> currentCell;
+    TreeItem<DataEntry> root;
 
     private ContextMenu contextMenu;
     private Tooltip tp;
@@ -54,6 +57,14 @@ public class OverviewController extends Application implements Initializable {
 
     private Properties properties;
     private String summaryDays;
+    private String currentFilter = "";
+    private FilterType currentType = FilterType.All;
+
+    enum FilterType {
+        Date,
+        Group,
+        All
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -75,63 +86,63 @@ public class OverviewController extends Application implements Initializable {
     // Methods used by the buttons in PlannerOverview.fxml to filter the data
     @FXML
     private void handleSummary() {
-        filterOnDaysUntilCompletion(summaryDays);
+        filterChanged(summaryDays.toString(), FilterType.Date);
         sortColumn(5, true);
     }
 
     @FXML
     private void handleFinance() {
-        filterOnGroup("Finance");
+        filterChanged("Finance", FilterType.Group);
     }
 
     @FXML
     private void handleAssets() {
-        filterOnGroup("Assets");
+        filterChanged("Assets", FilterType.Group);
     }
 
     @FXML
     private void handleHSE() {
-        filterOnGroup("HSE");
+        filterChanged("HSE", FilterType.Group);
     }
 
     @FXML
     private void handleStakeholders() {
-        filterOnGroup("Stakeholders");
+        filterChanged("Stakeholders", FilterType.Group);
     }
 
     @FXML
     private void handleAuthorities() {
-        filterOnGroup("Authorities");
+        filterChanged("Authorities", FilterType.Group);
     }
 
     @FXML
     private void handleGrid() {
-        filterOnGroup("Grid");
+        filterChanged("Grid", FilterType.Group);
     }
 
     @FXML
     private void handleCivil() {
-        filterOnGroup("Civil");
+        filterChanged("Civil", FilterType.Group);
     }
 
     @FXML
     private void handleInsurance() {
-        filterOnGroup("Insurance");
+        filterChanged("Insurance", FilterType.Group);
     }
 
     @FXML
     private void handleAccounting() {
-        filterOnGroup("Accounting");
+        filterChanged("Accounting", FilterType.Group);
     }
 
     @FXML
     private void handleRevision() {
-        filterOnGroup("Revision");
+        filterChanged("Revision", FilterType.Group);
     }
 
     @FXML
     private void handleAll() {
-        filterOnGroup("");
+        filterChanged("", FilterType.Group);
     }
 
     @FXML
@@ -142,14 +153,14 @@ public class OverviewController extends Application implements Initializable {
         } else if (event.getCode().equals(KeyCode.S)) {
             sortColumn(5, true);
         } else if (event.getCode().equals(KeyCode.ESCAPE)) {
-
+            filterChanged("", FilterType.All);
         }
     }
 
     public void showAddEntry() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("AddEntry.fxml"));
-            Parent root1 = (Parent) fxmlLoader.load();
+            Parent root1 = fxmlLoader.load();
 
             AddEntryController controller = fxmlLoader.getController();
             controller.setGroupComboList(groupComboList);
@@ -193,7 +204,7 @@ public class OverviewController extends Application implements Initializable {
     public void showEmployees() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("ManageEmployees.fxml"));
-            Parent root1 = (Parent) fxmlLoader.load();
+            Parent root1 = fxmlLoader.load();
 
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -213,7 +224,7 @@ public class OverviewController extends Application implements Initializable {
     public void showSettings() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Settings.fxml"));
-            Parent root1 = (Parent) fxmlLoader.load();
+            Parent root1 = fxmlLoader.load();
 
             Stage stage = new Stage();
             SettingsController controller = fxmlLoader.getController();
@@ -237,7 +248,7 @@ public class OverviewController extends Application implements Initializable {
     private void showRepeat() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("Repeat.fxml"));
-            Parent root1 = (Parent) fxmlLoader.load();
+            Parent root1 = fxmlLoader.load();
 
             RepeatController controller = fxmlLoader.getController();
             controller.setEntry(table.getSelectionModel().getSelectedItem().getValue());
@@ -269,21 +280,66 @@ public class OverviewController extends Application implements Initializable {
         col.setSortable(true);
     }
 
-    private void filterOnDaysUntilCompletion(String days) {
+    private void filterChanged(String filter, FilterType type) {
+        if (filter.isEmpty()) {
+            table.setRoot(root);
+        }
+        else {
+            TreeItem<DataEntry> filteredRoot = new TreeItem<>();
+            filter(root, filter, filteredRoot, type);
+            table.setRoot(filteredRoot);
+
+        }
+    }
+
+    private void filter(TreeItem<DataEntry> root, String filter, TreeItem<DataEntry> filteredRoot, FilterType type) {
+        for (TreeItem<DataEntry> child : root.getChildren()) {
+            TreeItem<DataEntry> filteredChild = new TreeItem<>();
+            filteredChild.setValue(child.getValue());
+            filteredChild.setExpanded(true);
+            filter(child, filter, filteredChild, type);
+            currentFilter = filter;
+            switch (type) {
+                case Group:
+                    textField.clear();
+                    currentType = FilterType.Group;
+                    if (!filteredChild.getChildren().isEmpty() || filterOnGroup(filter, filteredChild.getValue())) {
+                        filteredRoot.getChildren().add(filteredChild);
+                    }
+                    break;
+                case Date:
+                    textField.clear();
+                    currentType = FilterType.Date;
+                    if (!filteredChild.getChildren().isEmpty() || daysUntilCompletion(filter, filteredChild.getValue())) {
+                        filteredRoot.getChildren().add(filteredChild);
+                    }
+                    break;
+                case All:
+                    currentType = FilterType.All;
+                    if (!filteredChild.getChildren().isEmpty() || filterOnAll(filter, filteredChild.getValue())) {
+                        filteredRoot.getChildren().add(filteredChild);
+                    break;
+                    }
+            }
+        }
+    }
+
+    private boolean daysUntilCompletion(String days, DataEntry entry) {
         Date date = Date.from(LocalDate.now().plusDays(1 + Integer.parseInt(days)).atStartOfDay(ZoneId.systemDefault()).toInstant());
-        table.setPredicate(entry -> entry.getValue().getPlannedEnd().before(date) && entry.getValue().getEnd() == null);
-        table.getSelectionModel().clearSelection();
+        return entry.getPlannedEnd().before(date) && entry.getEnd() == null;
     }
 
-    private void filterOnGroup(String filter) {
-        table.setPredicate(entry -> entry.getValue().getGroup().contains(filter));
-        table.getSortOrder().clear();
+    private boolean filterOnGroup(String filter, DataEntry entry) {
+        return entry.getGroup().contains(filter);
     }
 
-    private void filterOnAll(String filter) {
-        table.setPredicate(entry -> entry.getValue().toString().toLowerCase().contains(filter.toLowerCase()));
+    private boolean filterOnAll(String filter, DataEntry entry) {
+        return entry.toString().toLowerCase().contains(filter.toLowerCase());
     }
 
+    public void refreshFilter() {
+        filterChanged(currentFilter, currentType);
+    }
 
 
     @SuppressWarnings("Duplicates")
@@ -297,7 +353,8 @@ public class OverviewController extends Application implements Initializable {
 
         summaryDays = properties.getConfigProps().getProperty("summaryDays");
 
-        textField.textProperty().addListener((o,oldVal,newVal)-> filterOnAll(newVal));
+        // Bind filterChanged to textField
+        textField.textProperty().addListener((o,oldVal,newVal)-> filterChanged(newVal, FilterType.All));
 
 
         // Create all columns
@@ -327,9 +384,9 @@ public class OverviewController extends Application implements Initializable {
 
         // Setting data, root and all table-columns
         ObservableList<DataEntry> data = FXCollections.observableArrayList();
-        TreeItem<DataEntry> root = new RecursiveTreeItem<>(data, RecursiveTreeObject::getChildren);
+        root = new RecursiveTreeItem<>(data, RecursiveTreeObject::getChildren);
 
-        table.getColumns().setAll(group, activity, mandatory, repeat, start, plannedEnd, end, responsible, progress, status);
+        table.getColumns().setAll(group, activity, mandatory, repeat, start, plannedEnd, end, responsible, progress/*, status*/);
         table.setEditable(true);
         table.setRoot(root);
         table.setShowRoot(false);
@@ -388,18 +445,30 @@ public class OverviewController extends Application implements Initializable {
         Callback<TreeTableColumn<DataEntry, Double>, TreeTableCell<DataEntry, Double>> progressCellFactory =
                 jfxTreeTableColumn -> {
                     ProgressBarTreeTableCell<DataEntry> cell = new ProgressBarTreeTableCell<>() {
+
+
+
                         @Override
                         public void updateItem(Double item, boolean empty) {
                             super.updateItem(item, empty);
-
+                            this.setPadding(new Insets(0,10,0,10));
                             if (!isEmpty()) {
-                                if (this.getTreeTableRow().getTreeItem().getValue().getEnd() != null) {
-                                    this.setStyle("-fx-accent: rgb(0,201,0);");
-                                } else if (item == 1){
-                                    this.setStyle("-fx-accent: rgb(231,0,0)");
+                                try {
+                                    if (this.getTreeTableRow().getTreeItem().getValue().getEnd() != null) {
+                                        this.setStyle("-fx-accent: #00c900;");
+                                    } else if (item == 1) {
+                                        this.setStyle("-fx-accent: #e70000");
+                                    } else if (daysUntilCompletion(summaryDays, this.getTreeTableRow().getItem()) && item >= 0.6) {
+                                        this.setStyle("-fx-accent: #ff7c0d");
+                                    } else if (daysUntilCompletion(summaryDays, this.getTreeTableRow().getItem())) {
+                                        this.setStyle("-fx-accent: #FFFF00");
+                                    } else {
+                                        this.setStyle("-fx-accent: #1976D2");
+                                    }
+                                } catch (NullPointerException e) {
+                                    System.out.println("Null-pointer");
                                 }
                             }
-
                         }
                     };
                     cell.addEventFilter(MouseEvent.MOUSE_CLICKED, new MyEventHandler());
@@ -506,7 +575,7 @@ public class OverviewController extends Application implements Initializable {
 
         // Sets autoUpdate boolean to true and starts the autoUpdate method in Connector
         Connector.setAutoUpdate(true);
-        Connector.autoUpdate(data);
+        Connector.autoUpdate(data, this);
     }
 
     // Creates a contextmenu and fills it with items

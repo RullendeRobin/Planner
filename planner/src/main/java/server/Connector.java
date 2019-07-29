@@ -3,15 +3,23 @@ package server;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import core.DataEntry;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.commons.lang3.StringUtils;
+import ui.OverviewController;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.TemporalUnit;
 import java.util.Date;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -49,7 +57,7 @@ public class Connector {
     private final String url = String.format("jdbc:sqlserver://%s:1433;database=%s;user=%s;password=%s;encrypt=true;"
             + "hostNameInCertificate=*.database.windows.net;loginTimeout=30;", hostName, dbName, user, password);
 
-
+    private static ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
     // Constructor
     public Connector() {
@@ -298,7 +306,7 @@ public class Connector {
                 statement.setDate(5, convertToSQLDate(addToDate(entry.getPlannedEnd(), i*timeframe, unit)));
                 statement.setDate(6, null);
                 statement.setString(7, entry.getResponsible());
-                statement.setString(8, entry.getStatus());
+                statement.setString(8, "Incomplete");
                 statement.setInt(9, entry.getId());
                 statement.setString(10, "REPEAT");
                 statement.addBatch();
@@ -341,12 +349,12 @@ public class Connector {
         return (date == null) ? null : new java.sql.Date(date.getTime());
     }
 
-    private static Date addToDate(Date date, int timeframe, TemporalUnit unit) {
+    private static Date addToDate(Date date, int timeFrame, TemporalUnit unit) {
 
         if (date == null) {
             return null;
         }
-        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().plus(timeframe, unit);
+        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().plus(timeFrame, unit);
         return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
@@ -360,11 +368,10 @@ public class Connector {
     }
 
     // Queries the database after each period. If there are changes made to the database, the changes will be reflected in the local data.
-    // autoUpdate boolean must true for loop to run
-    public static void autoUpdate(ObservableList<DataEntry> data) {
+    // autoUpdate boolean must be true for the loop to run
+    public static void autoUpdate(ObservableList<DataEntry> data, OverviewController overviewController) {
 
-
-        java.util.TimerTask task = new java.util.TimerTask() {
+        java.util.TimerTask queryTask = new java.util.TimerTask() {
             @Override
             public void run() {
 
@@ -373,25 +380,19 @@ public class Connector {
                     ObservableList<DataEntry> temp = getData();
 
                     if (!data.equals(temp)) {
-                        System.out.println("Difference: " + StringUtils.difference(data.toString(), temp.toString()));
 
+                        System.out.println("Difference: " + StringUtils.difference(data.toString(), temp.toString()));
                         data.clear();
                         data.addAll(temp);
 
+                        // As refreshFilter() modifies UI elements it has to be called using the JavaFX thread
+                        Platform.runLater(() -> overviewController.refreshFilter());
                     }
                 }
             }
         };
-        java.util.Timer timer = new java.util.Timer(true);// true to run timer as daemon thread
-        timer.schedule(task, 0, 500);// Run task every 0.5 second
-        /*
-        try {
-            Thread.sleep(60000); // Cancel task after 1 minute.
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        timer.cancel();
+        // executorService runs queryTask every 0.5 seconds
+        executorService.scheduleAtFixedRate(queryTask, 0, 500, TimeUnit.MILLISECONDS);
 
-         */
     }
 }
