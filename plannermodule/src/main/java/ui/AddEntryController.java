@@ -71,4 +71,8 @@ public class AddEntryController implements Initializable {
         this.responsibleComboList = responsibleComboList;
         responsible.getItems().addAll(responsibleComboList);
     }
+
+    public void setGroup(String group) {
+        this.group.getSelectionModel().select(group);
+    }
 }

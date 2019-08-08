@@ -68,7 +68,7 @@
     -jfx-focus-color: #ef5350;
 }
 
-/*Main Screen CSS Styling starts here*/
+/*core.Main Screen CSS Styling starts here*/
 
 /*TablPane styling*/
 .tab{
@@ -308,10 +308,9 @@
 
 /*Checkbox*/
 
-.checkbox-main{
-    -fx-text-fill: -fx-secondary;
+.jfx-check-box{
     -jfx-checked-color: -fx-primary;
-    -fx-font-size: 10pt;
+    /*-fx-font-size: 10pt;*/
 }
 
 /*Progrss bar*/

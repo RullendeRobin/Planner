@@ -6,7 +6,6 @@ import core.DataEntry;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.apache.commons.lang3.StringUtils;
 import ui.OverviewController;
 
 import java.sql.Connection;
@@ -26,9 +25,10 @@ import java.util.logging.Logger;
 public class Connector {
 
     // SQL queries
-    private static final String sqlSelectActivities = "SELECT * FROM Activities";
-    private static final String sqlInsert = "INSERT INTO Activities (GroupName, Activity, Mandatory, PlannedStart, PlannedEnd, Completion, Responsible, CurrStatus, RepeatID, Repeat) "
-            + "VALUES (?,?,?,?,?,?,?,?,?,?)";
+    // Table - Activities
+    private static final String sqlSelectActivities = "SELECT * FROM Activities WHERE Project = ?";
+    private static final String sqlInsert = "INSERT INTO Activities (GroupName, Activity, Mandatory, PlannedStart, PlannedEnd, Completion, Responsible, CurrStatus, RepeatID, Repeat, Project) "
+            + "VALUES (?,?,?,?,?,?,?,?,?,?,?)";
     private static final String sqlDeleteEntry = "DELETE FROM Activities WHERE ID = ?";
     private static final String sqlDeleteRepeat = "DELETE FROM Activities WHERE RepeatID = ?";
     public static final String groupUpdate = "UPDATE Activities SET GroupName = ? WHERE ID = ?";
@@ -41,40 +41,54 @@ public class Connector {
     public static final String plannedEndUpdate = "UPDATE Activities SET PlannedEnd = ? WHERE ID = ?";
     public static final String repeatUpdate = "UPDATE Activities SET Repeat = ? WHERE ID = ?";
 
+    // Table - Employees
     private static final String sqlSelectEmployees = "SELECT * FROM Employees";
     private static final String sqlInsertEmployee = "INSERT INTO Employees (FullName) "
             + "VALUES (?)";
     private static final String sqlDeleteEmployee = "DELETE FROM Employees WHERE FullName = ?";
 
+    // Table - Projects
+    private static final String sqlSelectProjects = "SELECT * FROM Projects";
+    private static final String sqlInsertProject = "INSERT INTO Projects (Project, Created)" + "VALUES (?,?)";
+    //private static final String sqlDeleteProject = "DELETE FROM Projects WHERE Project = ?";
+
+    //Table - Groups
+    private static final String sqlSelectGroups = "SELECT GroupName FROM Groups WHERE Project = ?";
+    private static final String sqlInsertGroup = "INSERT INTO Groups (GroupName, Project) "
+            + "VALUES (?,?)";
+    private static final String sqlDeleteGroup = "DELETE FROM Groups WHERE GroupName = ? AND Project = ?";
+    private static final String groupByAsc = " GROUP BY GroupName";
+
     private static HikariDataSource ds;
     private static boolean autoUpdate = false;
-
-    // Database information
-    private final String hostName = "plannersqlserver.database.windows.net"; // set server address
-    private final String dbName = "plannerDatabase"; // set database name
-    private final String user = "zephyradmin"; // set database username
-    private final String password = "VelkommenZephyr2019!"; // set database password
-    private final String url = String.format("jdbc:sqlserver://%s:1433;database=%s;user=%s;password=%s;encrypt=true;"
-            + "hostNameInCertificate=*.database.windows.net;loginTimeout=30;", hostName, dbName, user, password);
+    private static String project;
 
     private static ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
-    // Constructor
-    public Connector() {
-        ds = getDataSource();
-    }
+    // Database information
+    private static final String hostName = "plannersqlserver.database.windows.net"; // set server address
+    private static final String dbName = "plannerDatabase"; // set database name
+    private static final String user = "zephyradmin"; // set database username
+    private static final String password = "VelkommenZephyr2019!"; // set database password
+    private static final String url = String.format("jdbc:sqlserver://%s:1433;database=%s;user=%s;password=%s;encrypt=true;"
+            + "hostNameInCertificate=*.database.windows.net;loginTimeout=30;", hostName, dbName, user, password);
+
 
     // Sets up the datasource using a HikariConfig with the database information
-    private HikariDataSource getDataSource() {
+    static {
         HikariConfig config = new HikariConfig();
         config.setMaximumPoolSize(10);
         config.setDataSourceClassName("com.microsoft.sqlserver.jdbc.SQLServerDataSource");
-        config.addDataSourceProperty("serverName", this.hostName);
-        config.addDataSourceProperty("databaseName", this.dbName);
-        config.addDataSourceProperty("user", this.user);
-        config.addDataSourceProperty("password", this.password);
+        config.addDataSourceProperty("serverName", hostName);
+        config.addDataSourceProperty("databaseName", dbName);
+        config.addDataSourceProperty("user", user);
+        config.addDataSourceProperty("password", password);
 
-        return new HikariDataSource(config);  //pass in HikariConfig to HikariDataSource
+        ds = new HikariDataSource(config);  //pass in HikariConfig to HikariDataSource
+    }
+
+    // Constructor
+    private Connector() {
     }
 
     //Gets the connection for the HikariDataSource
@@ -96,6 +110,7 @@ public class Connector {
 
             // Execute a SQL statement.
             statement = connection.prepareStatement(sqlSelectActivities);
+            statement.setString(1, project);
             ResultSet rs = statement.executeQuery();
             connection.commit();
 
@@ -140,6 +155,7 @@ public class Connector {
             statement.setString(8, entry.getStatus());
             statement.setObject(9, null);
             statement.setString(10, "No");
+            statement.setString(11, project);
 
             statement.executeUpdate();
             connection.commit();
@@ -282,7 +298,7 @@ public class Connector {
 
             statement.executeUpdate();
             connection.commit();
-            System.out.println("Row deleted");
+            System.out.println("Employee deleted");
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -309,6 +325,7 @@ public class Connector {
                 statement.setString(8, "Incomplete");
                 statement.setInt(9, entry.getId());
                 statement.setString(10, "REPEAT");
+                statement.setString(11, project);
                 statement.addBatch();
             }
 
@@ -339,6 +356,134 @@ public class Connector {
             e.printStackTrace();
         }
     }
+
+    public static ObservableList<String> getProjects() {
+        PreparedStatement statement = null;
+
+        ObservableList<String> obsList = FXCollections.observableArrayList();
+
+        // Request connection from pool
+        try (Connection connection = getConnection()) {
+
+            connection.setAutoCommit(false);
+
+            // Execute a SQL statement.
+            statement = connection.prepareStatement(sqlSelectProjects);
+            ResultSet rs = statement.executeQuery();
+            connection.commit();
+
+            // Loop through results from the select query and add results to a list
+            while (rs.next()) {
+                obsList.add(rs.getString(1));
+            }
+
+        } catch (SQLException e) {
+            Logger lgr = Logger.getLogger(Connector.class.getName());
+            lgr.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
+        }
+
+        return obsList;
+    }
+
+    public static void insertProject(String project) {
+
+        PreparedStatement statement = null;
+
+        try (Connection connection = getConnection()){
+
+            connection.setAutoCommit(false);
+            statement = connection.prepareStatement(sqlInsertProject);
+
+            statement.setString(1, project);
+            statement.setDate(2, convertToSQLDate(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant())));
+
+            statement.executeUpdate();
+            connection.commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static ObservableList<String> getGroups(boolean sortAsc) {
+        PreparedStatement statement = null;
+
+        ObservableList<String> obsList = FXCollections.observableArrayList();
+
+        // Request connection from pool
+        try (Connection connection = getConnection()) {
+
+            connection.setAutoCommit(false);
+
+            // Execute a SQL statement.
+            if (sortAsc) {
+                statement = connection.prepareStatement(sqlSelectGroups + groupByAsc);
+            } else {
+                statement = connection.prepareStatement(sqlSelectGroups);
+            }
+
+            statement.setString(1, project);
+            ResultSet rs = statement.executeQuery();
+            connection.commit();
+
+            // Loop through results from the select query and add results to a list
+            while (rs.next()) {
+
+                obsList.add(rs.getString(1));
+            }
+
+        } catch (SQLException e) {
+            Logger lgr = Logger.getLogger(Connector.class.getName());
+            lgr.log(Level.SEVERE, e.getMessage(), e);
+            e.printStackTrace();
+        }
+
+        return obsList;
+    }
+
+    // Inserts a new Group into the database
+    public static void insertGroup(String group) {
+
+        PreparedStatement statement = null;
+
+        try (Connection connection = getConnection()){
+
+            connection.setAutoCommit(false);
+            statement = connection.prepareStatement(sqlInsertGroup);
+
+            statement.setString(1, group);
+            statement.setString(2, project);
+
+            statement.executeUpdate();
+            connection.commit();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void deleteGroup(String group) {
+
+        PreparedStatement statement = null;
+
+        try (Connection connection = getConnection()){
+
+            connection.setAutoCommit(false);
+            statement = connection.prepareStatement(sqlDeleteGroup);
+
+            statement.setString(1, group);
+            statement.setString(2, project);
+
+            statement.executeUpdate();
+            connection.commit();
+            System.out.println("Group deleted");
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     // Return null if the date is null, otherwise return a java.util.Date
     private static Date convertToUtilDate(java.sql.Date date) {
         return (date == null) ? null : new Date(date.getTime());
@@ -356,6 +501,10 @@ public class Connector {
         }
         LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().plus(timeFrame, unit);
         return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+    }
+
+    public static void setProject(String project) {
+        Connector.project = project;
     }
 
     // Getter and setter for autoUpdate boolean
@@ -381,12 +530,19 @@ public class Connector {
 
                     if (!data.equals(temp)) {
 
-                        System.out.println("Difference: " + StringUtils.difference(data.toString(), temp.toString()));
+                        //Platform.runLater(overviewController::saveSort);
+                        overviewController.saveSort();
+                        overviewController.saveSelection();
                         data.clear();
                         data.addAll(temp);
 
+                        // Apply current filter to the new data
                         // As refreshFilter() modifies UI elements it has to be called using the JavaFX thread
-                        Platform.runLater(() -> overviewController.refreshFilter());
+                        Platform.runLater(() -> {
+                            overviewController.refreshFilter();
+                            overviewController.refreshSort();
+                            overviewController.refreshSelection();
+                        });
                     }
                 }
             }
@@ -395,4 +551,5 @@ public class Connector {
         executorService.scheduleAtFixedRate(queryTask, 0, 500, TimeUnit.MILLISECONDS);
 
     }
+
 }

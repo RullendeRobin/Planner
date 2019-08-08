@@ -10,23 +10,23 @@ import server.Connector;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class AddEmployeeController implements Initializable {
+public class AddProjectController implements Initializable {
 
     @FXML
-    private JFXButton addBtn;
+    private JFXButton createBtn;
 
     @FXML
     private JFXTextField textField;
 
-    private EmployeeController controller;
+    private ProjectController controller;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        addBtn.setOnAction(event -> {
+        createBtn.setOnAction(event -> {
             if (!textField.getText().equals("")) {
-                Connector.insertEmployee(textField.getText());
-                Stage stage = (Stage) addBtn.getScene().getWindow();
+                Connector.insertProject(textField.getText());
+                Stage stage = (Stage) createBtn.getScene().getWindow();
                 stage.close();
                 controller.fillListView();
             } else {
@@ -35,7 +35,7 @@ public class AddEmployeeController implements Initializable {
         });
     }
 
-    public void setController(EmployeeController controller) {
+    public void setController(ProjectController controller) {
         this.controller = controller;
     }
 }

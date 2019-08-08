@@ -20,7 +20,8 @@
               <menus>
                 <Menu mnemonicParsing="false" text="File">
                   <items>
-                    <MenuItem mnemonicParsing="false" onAction="#showEmployees" text="Manage employees" />
+                        <MenuItem mnemonicParsing="false" onAction="#showEmployees" text="Manage employees" />
+                        <MenuItem mnemonicParsing="false" onAction="#showGroups" text="Manage groups" />
                         <MenuItem mnemonicParsing="false" onAction="#showSettings" text="Settings" />
                         <MenuItem mnemonicParsing="false" onAction="#close" text="Close" />
                   </items>

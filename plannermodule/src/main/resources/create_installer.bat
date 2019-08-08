@@ -1,0 +1,2 @@
+cd C:\Users\RobinAlexanderFinsta\IdeaProjects\Planner
+jpackager create-installer --output myoutput --name Planner --runtime-image java-runtime -j planner-jar-with-dependencies.jar -i plannermodule\target --icon plannermodule\src\main\resources\ui\zephyr_logo48x48_icon.ico --win-menu --win-per-user-install --win-dir-chooser --win-shortcut --singleton --win-upgrade-uuid fd04ac4c-bf5f-4151-a511-6287ed6f13ba --version 1.0

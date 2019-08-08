@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Built-By: RobinAlexanderFinsta
+Build-Jdk: 11.0.3
+Implementation-Title: plannermodule
+Implementation-Version: 1.1
+Implementation-Vendor-Id: zephyr.plannermodule
+Implementation-Vendor: Zephyr
+Main-Class: core.Main

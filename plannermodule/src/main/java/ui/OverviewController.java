@@ -4,9 +4,7 @@ import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.controls.RecursiveTreeItem;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
-import com.sun.javafx.application.LauncherImpl;
 import core.*;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -25,6 +24,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
@@ -33,10 +33,12 @@ import server.Connector;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.ResourceBundle;
 
-public class OverviewController extends Application implements Initializable {
+public class OverviewController implements Initializable {
 
     @FXML
     private JFXTreeTableView<DataEntry> table;
@@ -45,7 +47,9 @@ public class OverviewController extends Application implements Initializable {
     private TextField textField;
 
     @FXML
-    private ToggleGroup filterGroup;
+    private HBox hbox;
+
+    private ToggleGroup filterGroup = new ToggleGroup();
 
     private TreeTableCell<DataEntry, Object> currentCell;
     TreeItem<DataEntry> root;
@@ -57,10 +61,21 @@ public class OverviewController extends Application implements Initializable {
     private ObservableList<String> mandatoryComboList;
     private ObservableList<String> responsibleComboList;
 
+    private List<TreeTableColumn<DataEntry, ?>> sortColumns;
+    private List<TreeTableColumn.SortType> sortTypes;
+
+    // Properties
     private Properties properties;
     private String summaryDays;
+    private boolean sortGroupsAlphabetically = true;
+    private boolean sortEmployeesAlphabetically = true;
+
     private String currentFilter = "";
-    private FilterType currentType = FilterType.All;
+    private FilterType currentFilterType = FilterType.Date;
+    private FilterType currentTabType = FilterType.Date;
+    private String currentTabName = "Summary";
+    private String project = "";
+    private int currentSelectionId;
 
     enum FilterType {
         Date,
@@ -68,94 +83,15 @@ public class OverviewController extends Application implements Initializable {
         All
     }
 
-    @Override
-    public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("PlannerOverview.fxml"));
-        primaryStage.setTitle("Planner");
-        primaryStage.setScene(new Scene(root));
-        primaryStage.getIcons().addAll(
-                new Image(getClass().getResourceAsStream("zephyr_logo16x16.png")),
-                new Image(getClass().getResourceAsStream("zephyr_logo32x32.png")),
-                new Image(getClass().getResourceAsStream("zephyr_logo64x64.png")));
-        primaryStage.show();
-    }
-
-    public static void main(String[] args) {
-        LauncherImpl.launchApplication(OverviewController.class, LoadingController.class, args);
-        //Application.launch(args);
-    }
-
-    // Methods used by the buttons in PlannerOverview.fxml to filter the data
-    @FXML
-    private void handleSummary() {
-        filterChanged(summaryDays.toString(), FilterType.Date);
-        sortColumn(5, true);
-    }
-
-    @FXML
-    private void handleFinance() {
-        filterChanged("Finance", FilterType.Group);
-    }
-
-    @FXML
-    private void handleAssets() {
-        filterChanged("Assets", FilterType.Group);
-    }
-
-    @FXML
-    private void handleHSE() {
-        filterChanged("HSE", FilterType.Group);
-    }
-
-    @FXML
-    private void handleStakeholders() {
-        filterChanged("Stakeholders", FilterType.Group);
-    }
-
-    @FXML
-    private void handleAuthorities() {
-        filterChanged("Authorities", FilterType.Group);
-    }
-
-    @FXML
-    private void handleGrid() {
-        filterChanged("Grid", FilterType.Group);
-    }
-
-    @FXML
-    private void handleCivil() {
-        filterChanged("Civil", FilterType.Group);
-    }
-
-    @FXML
-    private void handleInsurance() {
-        filterChanged("Insurance", FilterType.Group);
-    }
-
-    @FXML
-    private void handleAccounting() {
-        filterChanged("Accounting", FilterType.Group);
-    }
-
-    @FXML
-    private void handleRevision() {
-        filterChanged("Revision", FilterType.Group);
-    }
-
-    @FXML
-    private void handleAll() {
-        filterChanged("", FilterType.Group);
-    }
-
     @FXML
     private void handleOnKeyPressed(KeyEvent event) {
 
         if (event.getCode().equals(KeyCode.A)) {
-            table.refresh();
+            System.out.println(Stage.getWindows().toString());
         } else if (event.getCode().equals(KeyCode.S)) {
             sortColumn(5, true);
-        } else if (event.getCode().equals(KeyCode.ESCAPE)) {
-            filterChanged("", FilterType.All);
+        } else if (event.getCode().equals(KeyCode.D)) {
+            table.refresh();
         }
     }
 
@@ -167,6 +103,9 @@ public class OverviewController extends Application implements Initializable {
             AddEntryController controller = fxmlLoader.getController();
             controller.setGroupComboList(groupComboList);
             controller.setResponsibleComboList(Connector.getEmployees());
+            if (currentFilterType == FilterType.Group && currentFilter != null) {
+                controller.setGroup(currentFilter);
+            }
 
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
@@ -217,6 +156,30 @@ public class OverviewController extends Application implements Initializable {
                     new Image(getClass().getResourceAsStream("zephyr_logo16x16.png")),
                     new Image(getClass().getResourceAsStream("zephyr_logo32x32.png")),
                     new Image(getClass().getResourceAsStream("zephyr_logo64x64.png")));
+            stage.show();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void showGroups() {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("ManageGroups.fxml"));
+            Parent root1 = fxmlLoader.load();
+
+            GroupController controller = fxmlLoader.getController();
+            controller.setController(this);
+
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Manage groups");
+            stage.setScene(new Scene(root1));
+            stage.setResizable(false);
+            stage.getIcons().addAll(
+                    new Image(getClass().getResourceAsStream("zephyr_logo16x16.png")),
+                    new Image(getClass().getResourceAsStream("zephyr_logo32x32.png")),
+                    new Image(getClass().getResourceAsStream("zephyr_logo64x64.png")));
+            stage.setOnCloseRequest(event -> buildBottomMenu());
             stage.show();
         } catch(Exception e) {
             e.printStackTrace();
@@ -283,47 +246,74 @@ public class OverviewController extends Application implements Initializable {
     }
 
     private void filterChanged(String filter, FilterType type) {
-        if (filter.isEmpty()) {
+
+        if (filter.isEmpty() && currentTabType == FilterType.All) {
+            textField.clear();
+            currentFilter = "";
+            currentFilterType = FilterType.All;
             table.setRoot(root);
-        }
-        else {
+
+        } else if (filter.isEmpty() && currentTabType == FilterType.Group) {
+            TreeItem<DataEntry> filteredRoot = new TreeItem<>();
+            filter(root, currentTabName, filteredRoot, FilterType.Group);
+            table.setRoot(filteredRoot);
+
+        } else {
             TreeItem<DataEntry> filteredRoot = new TreeItem<>();
             filter(root, filter, filteredRoot, type);
             table.setRoot(filteredRoot);
-
         }
     }
 
     private void filter(TreeItem<DataEntry> root, String filter, TreeItem<DataEntry> filteredRoot, FilterType type) {
+
         for (TreeItem<DataEntry> child : root.getChildren()) {
             TreeItem<DataEntry> filteredChild = new TreeItem<>();
             filteredChild.setValue(child.getValue());
             filteredChild.setExpanded(true);
             filter(child, filter, filteredChild, type);
             currentFilter = filter;
+
             switch (type) {
+
                 case Group:
                     textField.clear();
-                    currentType = FilterType.Group;
+                    currentFilterType = FilterType.Group;
                     if (!filteredChild.getChildren().isEmpty() || filterOnGroup(filter, filteredChild.getValue())) {
                         filteredRoot.getChildren().add(filteredChild);
                     }
                     break;
+
                 case Date:
                     textField.clear();
-                    currentType = FilterType.Date;
+                    currentFilterType = FilterType.Date;
                     if (!filteredChild.getChildren().isEmpty() || daysUntilCompletion(filter, filteredChild.getValue())) {
                         filteredRoot.getChildren().add(filteredChild);
                     }
                     break;
+
                 case All:
-                    currentType = FilterType.All;
-                    if (filterGroup.getSelectedToggle() != null) {
-                        filterGroup.getSelectedToggle().setSelected(false);
-                    }
-                    if (!filteredChild.getChildren().isEmpty() || filterOnAll(filter, filteredChild.getValue())) {
-                        filteredRoot.getChildren().add(filteredChild);
-                    break;
+                    currentFilterType = FilterType.All;
+                    System.out.println(currentTabType);
+                    if (currentTabType == FilterType.Group) {
+                        DataEntry entry = filteredChild.getValue();
+                        if ((filterOnAll(filter, entry) && filterOnGroup(currentTabName, entry))) {
+                            filteredRoot.getChildren().add(filteredChild);
+                            break;
+                        }
+
+                    } else if (currentTabType == FilterType.Date) {
+                        DataEntry entry = filteredChild.getValue();
+                        if ((filterOnAll(filter, entry) && daysUntilCompletion(summaryDays, entry))) {
+                            filteredRoot.getChildren().add(filteredChild);
+                            break;
+                        }
+
+                    } else {
+                        if (filterOnAll(filter, filteredChild.getValue())) {
+                            filteredRoot.getChildren().add(filteredChild);
+                            break;
+                        }
                     }
             }
         }
@@ -343,7 +333,7 @@ public class OverviewController extends Application implements Initializable {
     }
 
     public void refreshFilter() {
-        filterChanged(currentFilter, currentType);
+        filterChanged(currentFilter, currentFilterType);
     }
 
 
@@ -351,16 +341,15 @@ public class OverviewController extends Application implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
-        new Connector();
-
         properties = new Properties();
         properties.loadProperties();
 
-        summaryDays = properties.getConfigProps().getProperty("summaryDays");
+        String tempDays = properties.getConfigProps().getProperty("summaryDays");
+        summaryDays = tempDays;
+        currentFilter = tempDays;
 
         // Bind filterChanged to textField
         textField.textProperty().addListener((o,oldVal,newVal)-> filterChanged(newVal, FilterType.All));
-
 
         // Create all columns
         JFXTreeTableColumn<DataEntry, String> group = new JFXTreeTableColumn<>("Group");
@@ -401,6 +390,7 @@ public class OverviewController extends Application implements Initializable {
         for (TreeTableColumn col : table.getColumns()) {
             col.setId(Integer.toString(i));
             col.setPrefWidth(100);
+            col.setContextMenu(null);
 
             i++;
         }
@@ -412,20 +402,8 @@ public class OverviewController extends Application implements Initializable {
         repeat.setMinWidth(75);
         repeat.setMaxWidth(100);
 
-        // List with options for the group-combobox
-        groupComboList = FXCollections.observableArrayList();
-        groupComboList.add("Finance");
-        groupComboList.add("Assets");
-        groupComboList.add("HSE");
-        groupComboList.add("Stakeholders");
-        groupComboList.add("Authorities");
-        groupComboList.add("Grid");
-        groupComboList.add("Civil");
-        groupComboList.add("Insurance");
-        groupComboList.add("Accounting");
-        groupComboList.add("Revision");
-
-        // Cell factory for the group-column, with a custom combobox-cell
+        // Cell factory for the group-column, with a custom combobox-cell and fetching groups from database
+        groupComboList = Connector.getGroups(sortGroupsAlphabetically);
         Callback<TreeTableColumn<DataEntry, String>, TreeTableCell<DataEntry, String>> groupCellFactory =
                 jfxTreeTableColumn -> {
                     CustomComboBoxCell cell = new CustomComboBoxCell(this, 0);
@@ -571,9 +549,10 @@ public class OverviewController extends Application implements Initializable {
 
         // Gets the newest list of employees from the database each time onEditStart() is called
         responsible.setOnEditStart(evt -> responsibleComboList = Connector.getEmployees());
+        group.setOnEditStart(evt -> groupComboList = Connector.getGroups(sortGroupsAlphabetically));
 
-
-
+        // Setup menubar at bottom
+        buildBottomMenu();
 
         // Initialize contextmenu
         initContextMenu();
@@ -581,6 +560,7 @@ public class OverviewController extends Application implements Initializable {
         // Sets autoUpdate boolean to true and starts the autoUpdate method in Connector
         Connector.setAutoUpdate(true);
         Connector.autoUpdate(data, this);
+        sortColumn(5, true);
     }
 
     // Creates a contextmenu and fills it with items
@@ -614,6 +594,7 @@ public class OverviewController extends Application implements Initializable {
     // Gets the correct coordinates of the mouse and displays the contextmenu
     public void showContextMenu(MouseEvent event) {
         if (event.getButton() == MouseButton.SECONDARY) {
+            contextMenu.hide();
             contextMenu.show(table, table.localToScreen(table.getBoundsInLocal()).getMinX()+ event.getX(),
                     table.localToScreen(table.getBoundsInLocal()).getMinY() + event.getY());
         }
@@ -656,6 +637,95 @@ public class OverviewController extends Application implements Initializable {
         System.exit(0);
     }
 
+    public void saveSort() {
+
+        sortColumns = new ArrayList<>();
+        sortTypes = new ArrayList<>();
+
+        System.out.println(table.getSortOrder());
+        if (!table.getSortOrder().isEmpty()) {
+            sortColumns.addAll(table.getSortOrder());
+            for (TreeTableColumn col : sortColumns) {
+                sortTypes.add(col.getSortType());
+            }
+        }
+    }
+
+    public void refreshSort() {
+        if (!sortColumns.isEmpty()) {
+            table.getSortOrder().clear();
+            int index = 0;
+            for (TreeTableColumn<DataEntry, ?> col : sortColumns) {
+                table.getSortOrder().add(col);
+                col.setSortType(sortTypes.get(index));
+                index++;
+            }
+            table.sort();
+        }
+    }
+
+    public void saveSelection() {
+        if (table.getSelectionModel().getSelectedItem() != null) {
+            currentSelectionId = table.getSelectionModel().getSelectedItem().getValue().getId();
+        } else {
+            currentSelectionId = 0;
+        }
+    }
+
+    public void refreshSelection() {
+        if (currentSelectionId != 0) {
+            table.getSelectionModel().clearSelection();
+            for (int i = 0 ; i < table.getCurrentItemsCount() ; i++) {
+                if (table.getTreeItem(i).getValue().getId() == currentSelectionId) {
+                    table.getSelectionModel().select(i);
+                }
+            }
+        }
+    }
+
+    // Queries the database for groups belonging to current project and builds the menubar at the bottom accordingly
+    void buildBottomMenu() {
+
+        groupComboList = Connector.getGroups(sortGroupsAlphabetically);
+
+        ObservableList<Node> hboxItems = hbox.getChildren();
+        Node searchBar = hboxItems.get(hboxItems.size()-1);
+        hboxItems.clear();
+
+        RadioToggleButton button = new RadioToggleButton("Summary");
+        button.getStyleClass().add("menu-toggle");
+        button.setToggleGroup(filterGroup);
+        button.setOnAction(event -> {
+            currentTabType = FilterType.Date;
+            currentTabName = "Summary";
+            filterChanged(summaryDays, FilterType.Date);
+            sortColumn(5, true);
+        });
+        hboxItems.add(button);
+        button.fire();
+
+        for (String item : groupComboList) {
+            addToggleButton(item, item, FilterType.Group);
+        }
+        addToggleButton("All", "", FilterType.All);
+
+        // Adds the, previously saved, search bar to the end of the menubar
+        hboxItems.add(searchBar);
+        table.refresh();
+    }
+
+    private void addToggleButton(String name, String filter, FilterType type) {
+        RadioToggleButton button = new RadioToggleButton(name);
+        button.getStyleClass().add("menu-toggle");
+        button.setToggleGroup(filterGroup);
+        button.setOnAction(event -> {
+            currentTabType = type;
+            currentTabName = name;
+            filterChanged(filter, type);
+        });
+        hbox.getChildren().add(button);
+    }
+
     public ObservableList<String> getResponsibleComboList() {
         return responsibleComboList;
     }
@@ -668,8 +738,20 @@ public class OverviewController extends Application implements Initializable {
         return mandatoryComboList;
     }
 
-    protected void setSummaryDays(String summaryDays) {
+    void setSummaryDays(String summaryDays) {
         this.summaryDays = summaryDays;
+    }
+
+    void setSortGroupsAlphabetically(boolean value) {
+        sortGroupsAlphabetically = value;
+    }
+
+    public boolean getSortGroupsAlphabetically() {
+        return sortGroupsAlphabetically;
+    }
+
+    void setProject(String project) {
+        this.project = project;
     }
 
     class MyEventHandler implements EventHandler<MouseEvent> {
@@ -697,6 +779,7 @@ public class OverviewController extends Application implements Initializable {
                 } catch (NullPointerException e) {
                     System.out.println("Null-pointer");
                     contextMenu.getItems().get(3).setDisable(true);
+                    contextMenu.getItems().get(4).setDisable(true);
                     contextMenu.getItems().get(6).setDisable(true);
                 }
             } else {
