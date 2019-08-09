@@ -1,0 +1,11 @@
+Endringer som skal gjøres:
+
+OPPGAVER UNDERVEIS:
+[-]endring av orginal endrer også repitisjoner
+[-]utvidet informasjon om entry
+[-]gå tilbake til prosjekt-meny
+
+FULLFØRTE OPPGAVER:
+[x]søking i katogori
+[x]bevare utførte repeats
+[x]endre navn på grupper

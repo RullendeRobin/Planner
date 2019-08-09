@@ -1,0 +1,52 @@
+--module-path
+"C:\Java\javafx-sdk-11.0.2\lib"
+--add-modules
+javafx.controls,javafx.fxml
+--add-opens
+javafx.base/com.sun.javafx.runtime=ALL-UNNAMED
+--add-opens
+javafx.controls/com.sun.javafx.scene.control.behavior=ALL-UNNAMED
+--add-opens
+javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED
+--add-opens
+javafx.base/com.sun.javafx.binding=ALL-UNNAMED
+--add-opens
+javafx.base/com.sun.javafx.event=ALL-UNNAMED
+--add-opens
+javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED
+
+v2?
+--module-path
+"C:\Java\javafx-sdk-11.0.2\lib"
+--add-modules
+javafx.controls,javafx.fxml
+--add-opens
+javafx.base/com.sun.javafx.runtime=ALL-UNNAMED
+--add-opens
+javafx.controls/com.sun.javafx.scene.control.behavior=ALL-UNNAMED
+--add-opens
+javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED
+--add-opens
+javafx.base/com.sun.javafx.binding=ALL-UNNAMED
+--add-opens
+javafx.base/com.sun.javafx.event=ALL-UNNAMED
+--add-opens
+javafx.graphics/com.sun.javafx.stage=ALL-UNNAMED
+
+
+--------------TERMINAL COMMANDS FOR DEPLOYMENT--------------
+
+REMOVED MODULES
+java.management,java.naming,java.rmi,java.transaction.xa
+
+CREATE CUSTOM RUNTIME
+jlink --no-header-files --no-man-pages --add-modules java.datatransfer,java.security.jgss,java.desktop,java.logging,java.scripting,java.sql,java.xml,jdk.jsobject,jdk.unsupported,jdk.unsupported.desktop,jdk.xml.dom --output java-runtime
+
+CREATE EXE FROM CUSTOM RUNTIME WITH FAT JAR
+jpackager create-image --output myoutput --name Planner --runtime-image java-runtime -j planner-jar-with-dependencies.jar -i plannermodule\target
+
+CREATE INSTALLER FROM CUSTOM RUNTIME WITH FAT JAR
+jpackager create-installer --output myoutput --name Planner --runtime-image java-runtime -j planner-jar-with-dependencies.jar -i plannermodule\target --icon plannermodule\src\main\resources\ui\zephyr_logo48x48_icon.ico --win-menu --win-per-user-install --win-dir-chooser --win-shortcut --singleton --win-upgrade-uuid fd04ac4c-bf5f-4151-a511-6287ed6f13ba --version 1.0
+
+RUN NORMAL JAR WITH CUSTOM RUNTIME
+java-runtime\bin\java.exe --module-path c:\Java\javafx-sdk-11.0.2\lib;C:\Users\RobinAlexanderFinsta\.m2\repository\com\jfoenix\jfoenix\9.0.8;C:\Users\RobinAlexanderFinsta\.m2\repository\com\zaxxer\HikariCP\3.3.1;C:\Users\RobinAlexanderFinsta\.m2\repository\org\slf4j\slf4j-api\1.7.25;C:\Users\RobinAlexanderFinsta\.m2\repository\org\slf4j\slf4j-simple\1.7.25;C:\Users\RobinAlexanderFinsta\.m2\repository\com\microsoft\sqlserver\mssql-jdbc\7.2.2.jre11 --add-modules=ALL-MODULE-PATH -jar plannermodule\target\planner.jar
